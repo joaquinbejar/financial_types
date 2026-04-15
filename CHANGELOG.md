@@ -48,6 +48,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `tests/serde_snapshots.rs` asserting the exact JSON encoding
   for every variant of every public enum. The wire format is now a
   SemVer-tracked contract documented in the crate-level docs.
+- Added `tests/utoipa.rs` exercising every enum's `utoipa::ToSchema`
+  derive. CI catches a forgotten `#[cfg_attr(feature = "utoipa", ...)]`
+  on a new enum.
 
 ## [0.1.0] - 2025-01-01
 
