@@ -26,6 +26,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `Display` impls now delegate to `as_str()` via `f.write_str`, removing
   the formatting-layer overhead on the hot path.
+- Crate is now `no_std`-compatible. New `std` feature (enabled by
+  default) gates the `serde/std` integration and is implied by the
+  `utoipa` feature. The `alloc` crate is always required.
+- `serde` dependency switched to `default-features = false`,
+  `features = ["derive", "alloc"]`.
 
 ## [0.1.0] - 2025-01-01
 
