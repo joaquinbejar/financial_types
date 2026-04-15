@@ -1,14 +1,19 @@
-[![Dual License](https://img.shields.io/badge/license-MIT-blue)](./LICENSE)
 [![Crates.io](https://img.shields.io/crates/v/financial_types.svg)](https://crates.io/crates/financial_types)
+[![docs.rs](https://img.shields.io/docsrs/financial_types)](https://docs.rs/financial_types)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![Downloads](https://img.shields.io/crates/d/financial_types.svg)](https://crates.io/crates/financial_types)
+
+[![Build](https://github.com/joaquinbejar/financial_types/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/joaquinbejar/financial_types/actions/workflows/build.yml)
+[![Lint](https://github.com/joaquinbejar/financial_types/actions/workflows/lint.yml/badge.svg?branch=main)](https://github.com/joaquinbejar/financial_types/actions/workflows/lint.yml)
+[![Format](https://github.com/joaquinbejar/financial_types/actions/workflows/format_check.yml/badge.svg?branch=main)](https://github.com/joaquinbejar/financial_types/actions/workflows/format_check.yml)
+[![Audit](https://github.com/joaquinbejar/financial_types/actions/workflows/audit.yml/badge.svg?branch=main)](https://github.com/joaquinbejar/financial_types/actions/workflows/audit.yml)
+[![Semver](https://github.com/joaquinbejar/financial_types/actions/workflows/semver.yml/badge.svg?branch=main)](https://github.com/joaquinbejar/financial_types/actions/workflows/semver.yml)
+[![Coverage](https://github.com/joaquinbejar/financial_types/actions/workflows/code_coverage.yml/badge.svg?branch=main)](https://github.com/joaquinbejar/financial_types/actions/workflows/code_coverage.yml)
+[![codecov](https://codecov.io/gh/joaquinbejar/financial_types/branch/main/graph/badge.svg)](https://codecov.io/gh/joaquinbejar/financial_types)
+
 [![Stars](https://img.shields.io/github/stars/joaquinbejar/financial_types.svg)](https://github.com/joaquinbejar/financial_types/stargazers)
 [![Issues](https://img.shields.io/github/issues/joaquinbejar/financial_types.svg)](https://github.com/joaquinbejar/financial_types/issues)
 [![PRs](https://img.shields.io/github/issues-pr/joaquinbejar/financial_types.svg)](https://github.com/joaquinbejar/financial_types/pulls)
-[![Build Status](https://img.shields.io/github/workflow/status/joaquinbejar/financial_types/CI)](https://github.com/joaquinbejar/financial_types/actions)
-[![Coverage](https://img.shields.io/codecov/c/github/joaquinbejar/financial_types)](https://codecov.io/gh/joaquinbejar/financial_types)
-[![Dependencies](https://img.shields.io/librariesio/github/joaquinbejar/financial_types)](https://libraries.io/github/joaquinbejar/financial_types)
-[![Documentation](https://img.shields.io/badge/docs-latest-blue.svg)](https://docs.rs/financial_types)
-[![Wiki](https://img.shields.io/badge/wiki-latest-blue.svg)](https://deepwiki.com/joaquinbejar/financial_types)
 
 
 ## Financial Types
