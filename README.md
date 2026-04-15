@@ -239,8 +239,6 @@ See [`CHANGELOG.md`](./CHANGELOG.md) for the full history of releases.
 
 This project is licensed under the MIT License.
 
-
-
 ## Contribution and Contact
 
 We welcome contributions to this project! If you would like to contribute, please follow these steps:
