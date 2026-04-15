@@ -56,6 +56,20 @@ make pre-push
 
 Run locally with `cargo deny check` before pushing dependency changes.
 
+## Mutation testing
+
+`cargo-mutants` runs in CI on every PR (and a full schedule on
+Sundays). Unkilled mutants mean the test suite cannot distinguish the
+intended behavior from a wrong implementation — fix by adding a test,
+not by `#[mutants::skip]`. Reproduce locally:
+
+```bash
+cargo install cargo-mutants
+cargo mutants --no-shuffle -j 2 --all-features --timeout 120
+```
+
+The report lands in `mutants.out/`.
+
 ## Coding standards
 
 - Preserve `#[repr(u8)]` on every public enum. Assert the 1-byte size

@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `cargo-mutants` CI workflow (`.github/workflows/mutants.yml`).
+  Runs on every PR (changed paths) and full sweep on Sundays.
+  Unkilled mutants surface untested branches.
 - `cargo-deny` CI workflow (`.github/workflows/deny.yml`) and root
   `deny.toml` enforcing license allow-list (MIT, Apache-2.0,
   BSD-2/3-Clause, ISC, Unicode, Zlib, MPL-2.0, CC0-1.0), advisory
