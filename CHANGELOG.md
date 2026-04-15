@@ -31,6 +31,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `utoipa` feature. The `alloc` crate is always required.
 - `serde` dependency switched to `default-features = false`,
   `features = ["derive", "alloc"]`.
+- Derives `PartialOrd, Ord` on `UnderlyingAssetType`, `Action`, and
+  `Side` (previously only `OptionStyle`). Ordering follows the
+  documented `#[repr(u8)]` discriminants and is non-breaking.
 
 ## [0.1.0] - 2025-01-01
 
