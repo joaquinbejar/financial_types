@@ -31,6 +31,23 @@ serde_json = { version = "1.0" }
 name = "financial_types"
 path = "src/lib.rs"
 
+[[example]]
+name = "parse_action"
+path = "examples/parse_action.rs"
+
+[[example]]
+name = "iterate_assets"
+path = "examples/iterate_assets.rs"
+
+[[example]]
+name = "serde_roundtrip"
+path = "examples/serde_roundtrip.rs"
+
+[[example]]
+name = "utoipa_schema"
+path = "examples/utoipa_schema.rs"
+required-features = ["utoipa"]
+
 [lints.rust]
 unsafe_code = "deny"
 missing_docs = "warn"

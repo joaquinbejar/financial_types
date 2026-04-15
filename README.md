@@ -189,6 +189,22 @@ assert_eq!(Side::try_from(0u8).unwrap(), Side::Long);
 assert!(Side::try_from(9u8).is_err());
 ```
 
+### Examples
+
+Runnable examples live in [`examples/`](./examples/):
+
+- [`parse_action`](./examples/parse_action.rs) — parse `Action` from a CLI string.
+- [`iterate_assets`](./examples/iterate_assets.rs) — iterate every `UnderlyingAssetType` via `ALL`.
+- [`serde_roundtrip`](./examples/serde_roundtrip.rs) — JSON round-trip every variant.
+- [`utoipa_schema`](./examples/utoipa_schema.rs) — dump OpenAPI schemas (requires `--features utoipa`).
+
+```bash
+cargo run --example parse_action -- buy
+cargo run --example iterate_assets
+cargo run --example serde_roundtrip
+cargo run --example utoipa_schema --features utoipa
+```
+
 ### Changelog
 
 See [`CHANGELOG.md`](./CHANGELOG.md) for the full history of releases.
