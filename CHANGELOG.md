@@ -11,6 +11,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **BREAKING**: `UnderlyingAssetType` and `Action` are now marked
+  `#[non_exhaustive]`. Future variants (new asset classes, new trading
+  actions) can be added without a major version bump. Downstream
+  exhaustive `match` expressions on these enums must add a wildcard
+  arm (`_ =>`). `Side` and `OptionStyle` remain intentionally exhaustive
+  (closed two-state concepts).
+
 ### Added
 
 - `ParseEnumError` public error type for failed enum parsing.

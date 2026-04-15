@@ -152,6 +152,12 @@ impl core::error::Error for ParseEnumError {}
 /// Represents the broad asset class to which an instrument belongs.
 /// Used for routing, risk bucketing, and display purposes.
 ///
+/// # Stability
+///
+/// This enum is `#[non_exhaustive]`. New asset classes may be added in
+/// minor releases without a major version bump. Downstream `match`
+/// expressions must include a wildcard arm (`_ =>`).
+///
 /// # Examples
 ///
 /// ```rust
@@ -167,6 +173,7 @@ impl core::error::Error for ParseEnumError {}
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[cfg_attr(feature = "arbitrary", derive(arbitrary::Arbitrary))]
 #[repr(u8)]
+#[non_exhaustive]
 pub enum UnderlyingAssetType {
     /// Cryptocurrency assets (e.g., BTC, ETH).
     Crypto = 0,
@@ -308,6 +315,12 @@ impl TryFrom<u8> for UnderlyingAssetType {
 /// trading system. These actions represent the direction of a trade
 /// transaction.
 ///
+/// # Stability
+///
+/// This enum is `#[non_exhaustive]`. New trading actions may be added in
+/// minor releases without a major version bump. Downstream `match`
+/// expressions must include a wildcard arm (`_ =>`).
+///
 /// # Examples
 ///
 /// ```rust
@@ -323,6 +336,7 @@ impl TryFrom<u8> for UnderlyingAssetType {
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[cfg_attr(feature = "arbitrary", derive(arbitrary::Arbitrary))]
 #[repr(u8)]
+#[non_exhaustive]
 pub enum Action {
     /// Represents a purchase transaction, where assets are acquired.
     #[default]
@@ -430,6 +444,12 @@ impl TryFrom<u8> for Action {
 /// or falling prices (Short). This is a fundamental concept in trading that
 /// determines how profits and losses are calculated and affects risk
 /// management considerations.
+///
+/// # Stability
+///
+/// This enum is intentionally **exhaustive**. Position directionality is
+/// a closed two-state concept (long vs. short); no future variants are
+/// planned. Downstream code may rely on exhaustive `match`.
 ///
 /// # Examples
 ///
@@ -561,6 +581,12 @@ impl TryFrom<u8> for Side {
 ///
 /// This is a critical attribute for options contracts as it directly affects
 /// valuation, pricing models, and exercise strategies.
+///
+/// # Stability
+///
+/// This enum is intentionally **exhaustive**. Option payoff direction is
+/// a closed two-state concept (call vs. put); no future variants are
+/// planned. Downstream code may rely on exhaustive `match`.
 ///
 /// # Examples
 ///
