@@ -23,6 +23,28 @@
 //!   returning [`ParseEnumError`] on failure. String parsing is
 //!   case-insensitive and trims whitespace.
 //!
+//! ## Wire format
+//!
+//! `serde` JSON encoding is part of the public contract. The string
+//! used for every variant is fixed and SemVer-tracked: renaming any
+//! variant string is a breaking change.
+//!
+//! | Enum                  | Variant     | JSON          |
+//! |-----------------------|-------------|---------------|
+//! | `UnderlyingAssetType` | `Crypto`    | `"Crypto"`    |
+//! | `UnderlyingAssetType` | `Stock`     | `"Stock"`     |
+//! | `UnderlyingAssetType` | `Forex`     | `"Forex"`     |
+//! | `UnderlyingAssetType` | `Commodity` | `"Commodity"` |
+//! | `UnderlyingAssetType` | `Bond`      | `"Bond"`      |
+//! | `UnderlyingAssetType` | `Other`     | `"Other"`     |
+//! | `Action`              | `Buy`       | `"Buy"`       |
+//! | `Action`              | `Sell`      | `"Sell"`      |
+//! | `Action`              | `Other`     | `"Other"`     |
+//! | `Side`                | `Long`      | `"Long"`      |
+//! | `Side`                | `Short`     | `"Short"`     |
+//! | `OptionStyle`         | `Call`      | `"Call"`      |
+//! | `OptionStyle`         | `Put`       | `"Put"`       |
+//!
 //! ## `no_std`
 //!
 //! The crate compiles in `no_std` environments. Disable default features:

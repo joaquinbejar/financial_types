@@ -45,6 +45,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Moved per-enum unit tests into a dedicated `tests/` integration
   directory. Each test now exercises only the public API surface,
   matching how downstream consumers use the crate.
+- Added `tests/serde_snapshots.rs` asserting the exact JSON encoding
+  for every variant of every public enum. The wire format is now a
+  SemVer-tracked contract documented in the crate-level docs.
 
 ## [0.1.0] - 2025-01-01
 
