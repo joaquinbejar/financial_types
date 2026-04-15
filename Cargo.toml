@@ -2,6 +2,7 @@
 name = "financial_types"
 version = "0.2.0"
 edition = "2024"
+rust-version = "1.85"
 authors = ["Joaquin Bejar <jb@taunais.com>"]
 description = "Core financial type definitions for trading systems: asset types, trading actions, position sides, and option styles."
 license = "MIT"

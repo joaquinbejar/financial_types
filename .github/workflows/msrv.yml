@@ -1,0 +1,49 @@
+name: MSRV
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - main
+      - 'release/**'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  msrv:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install MSRV toolchain (1.85)
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: "1.85"
+
+      - name: Cache Rust dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: msrv-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml') }}
+          restore-keys: |
+            msrv-${{ runner.os }}-cargo-
+
+      - name: Build (default features)
+        run: cargo +1.85 build
+
+      - name: Build (no default features)
+        run: cargo +1.85 build --no-default-features
+
+      - name: Build (all features)
+        run: cargo +1.85 build --all-features
+
+      - name: Test (all features)
+        run: cargo +1.85 test --all-features

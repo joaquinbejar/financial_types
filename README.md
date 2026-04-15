@@ -1,6 +1,7 @@
 [![Crates.io](https://img.shields.io/crates/v/financial_types.svg)](https://crates.io/crates/financial_types)
 [![docs.rs](https://img.shields.io/docsrs/financial_types)](https://docs.rs/financial_types)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
+[![MSRV](https://img.shields.io/badge/rustc-1.85%2B-blue.svg)](https://blog.rust-lang.org/2025/02/20/Rust-1.85.0/)
 [![Downloads](https://img.shields.io/crates/d/financial_types.svg)](https://crates.io/crates/financial_types)
 
 [![Build](https://github.com/joaquinbejar/financial_types/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/joaquinbejar/financial_types/actions/workflows/build.yml)
@@ -193,6 +194,12 @@ assert_eq!(asset, UnderlyingAssetType::Stock);
 assert_eq!(Side::try_from(0u8).unwrap(), Side::Long);
 assert!(Side::try_from(9u8).is_err());
 ```
+
+### Minimum Supported Rust Version (MSRV)
+
+`financial_types` requires **Rust 1.85** or later (edition 2024).
+A dedicated CI job builds and tests on the exact MSRV. Bumping the
+MSRV is a **minor** version change — never sneaked into a patch.
 
 ### Examples
 
