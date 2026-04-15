@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- README badge strip: crates.io, docs.rs, license, downloads, per-workflow
+  CI badges (build, lint, format, audit, semver, coverage), and Codecov.
 - `examples/` directory with four runnable examples covering parsing,
   iteration via `ALL`, serde round-trips, and (feature-gated)
   `utoipa::ToSchema` dumps. CI builds them under both default and
