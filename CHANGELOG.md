@@ -14,6 +14,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `UnderlyingAssetType`, `Action`, `Side`, and `OptionStyle`.
 - String parsing is case-insensitive and trims surrounding whitespace.
 - `TryFrom<u8>` uses the documented `#[repr(u8)]` discriminants.
+- `const fn as_str()` on every public enum returning a `&'static str`
+  matching the `Display` output. Zero-allocation alternative to `format!`.
+
+### Changed
+
+- `Display` impls now delegate to `as_str()` via `f.write_str`, removing
+  the formatting-layer overhead on the hot path.
 
 ## [0.1.0] - 2025-01-01
 

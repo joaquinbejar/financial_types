@@ -175,19 +175,28 @@ impl UnderlyingAssetType {
     pub const fn is_bond(&self) -> bool {
         matches!(self, Self::Bond)
     }
+
+    /// Returns the canonical string representation of this variant.
+    ///
+    /// Matches the [`fmt::Display`] output exactly and is allocation-free.
+    #[must_use]
+    #[inline]
+    pub const fn as_str(&self) -> &'static str {
+        match self {
+            Self::Crypto => "Crypto",
+            Self::Stock => "Stock",
+            Self::Forex => "Forex",
+            Self::Commodity => "Commodity",
+            Self::Bond => "Bond",
+            Self::Other => "Other",
+        }
+    }
 }
 
 impl fmt::Display for UnderlyingAssetType {
     #[inline]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::Crypto => write!(f, "Crypto"),
-            Self::Stock => write!(f, "Stock"),
-            Self::Forex => write!(f, "Forex"),
-            Self::Commodity => write!(f, "Commodity"),
-            Self::Bond => write!(f, "Bond"),
-            Self::Other => write!(f, "Other"),
-        }
+        f.write_str(self.as_str())
     }
 }
 
@@ -279,16 +288,25 @@ impl Action {
     pub const fn is_sell(&self) -> bool {
         matches!(self, Self::Sell)
     }
+
+    /// Returns the canonical string representation of this variant.
+    ///
+    /// Matches the [`fmt::Display`] output exactly and is allocation-free.
+    #[must_use]
+    #[inline]
+    pub const fn as_str(&self) -> &'static str {
+        match self {
+            Self::Buy => "Buy",
+            Self::Sell => "Sell",
+            Self::Other => "Other",
+        }
+    }
 }
 
 impl fmt::Display for Action {
     #[inline]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::Buy => write!(f, "Buy"),
-            Self::Sell => write!(f, "Sell"),
-            Self::Other => write!(f, "Other"),
-        }
+        f.write_str(self.as_str())
     }
 }
 
@@ -388,15 +406,24 @@ impl Side {
             Self::Short => Self::Long,
         }
     }
+
+    /// Returns the canonical string representation of this variant.
+    ///
+    /// Matches the [`fmt::Display`] output exactly and is allocation-free.
+    #[must_use]
+    #[inline]
+    pub const fn as_str(&self) -> &'static str {
+        match self {
+            Self::Long => "Long",
+            Self::Short => "Short",
+        }
+    }
 }
 
 impl fmt::Display for Side {
     #[inline]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::Long => write!(f, "Long"),
-            Self::Short => write!(f, "Short"),
-        }
+        f.write_str(self.as_str())
     }
 }
 
@@ -507,15 +534,24 @@ impl OptionStyle {
             Self::Put => Self::Call,
         }
     }
+
+    /// Returns the canonical string representation of this variant.
+    ///
+    /// Matches the [`fmt::Display`] output exactly and is allocation-free.
+    #[must_use]
+    #[inline]
+    pub const fn as_str(&self) -> &'static str {
+        match self {
+            Self::Call => "Call",
+            Self::Put => "Put",
+        }
+    }
 }
 
 impl fmt::Display for OptionStyle {
     #[inline]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::Call => write!(f, "Call"),
-            Self::Put => write!(f, "Put"),
-        }
+        f.write_str(self.as_str())
     }
 }
 
@@ -728,6 +764,26 @@ mod tests_underlying_asset_type {
             assert_eq!(variant, parsed);
         }
     }
+
+    #[test]
+    fn test_as_str_matches_display() {
+        for variant in [
+            UnderlyingAssetType::Crypto,
+            UnderlyingAssetType::Stock,
+            UnderlyingAssetType::Forex,
+            UnderlyingAssetType::Commodity,
+            UnderlyingAssetType::Bond,
+            UnderlyingAssetType::Other,
+        ] {
+            assert_eq!(variant.as_str(), format!("{variant}"));
+        }
+    }
+
+    #[test]
+    fn test_as_str_is_const() {
+        const STOCK: &str = UnderlyingAssetType::Stock.as_str();
+        assert_eq!(STOCK, "Stock");
+    }
 }
 
 #[cfg(test)]
@@ -808,6 +864,19 @@ mod tests_action {
             let parsed: Action = format!("{variant}").parse().unwrap();
             assert_eq!(variant, parsed);
         }
+    }
+
+    #[test]
+    fn test_as_str_matches_display() {
+        for variant in [Action::Buy, Action::Sell, Action::Other] {
+            assert_eq!(variant.as_str(), format!("{variant}"));
+        }
+    }
+
+    #[test]
+    fn test_as_str_is_const() {
+        const BUY: &str = Action::Buy.as_str();
+        assert_eq!(BUY, "Buy");
     }
 }
 
@@ -908,6 +977,19 @@ mod tests_side {
             let parsed: Side = format!("{variant}").parse().unwrap();
             assert_eq!(variant, parsed);
         }
+    }
+
+    #[test]
+    fn test_as_str_matches_display() {
+        for variant in [Side::Long, Side::Short] {
+            assert_eq!(variant.as_str(), format!("{variant}"));
+        }
+    }
+
+    #[test]
+    fn test_as_str_is_const() {
+        const LONG: &str = Side::Long.as_str();
+        assert_eq!(LONG, "Long");
     }
 }
 
@@ -1012,6 +1094,19 @@ mod tests_option_style {
             let parsed: OptionStyle = format!("{variant}").parse().unwrap();
             assert_eq!(variant, parsed);
         }
+    }
+
+    #[test]
+    fn test_as_str_matches_display() {
+        for variant in [OptionStyle::Call, OptionStyle::Put] {
+            assert_eq!(variant.as_str(), format!("{variant}"));
+        }
+    }
+
+    #[test]
+    fn test_as_str_is_const() {
+        const CALL: &str = OptionStyle::Call.as_str();
+        assert_eq!(CALL, "Call");
     }
 }
 

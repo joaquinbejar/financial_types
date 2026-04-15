@@ -58,3 +58,7 @@ logs/
 *.db
 *.sqlite
 /Cargo.lock
+
+# Claude Code local config
+.claude/
+rules/
