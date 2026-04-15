@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `pub const ALL: &'static [Self]` on every public enum, listing every
   variant in `#[repr(u8)]` discriminant order. Useful for iteration,
   validation, and UI generation.
+- `Action::opposite()` (`Buy ↔ Sell`; `Other → Other`). Brings `Action`
+  to API parity with `Side::opposite` and `OptionStyle::opposite`.
 
 ### Changed
 
