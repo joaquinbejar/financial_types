@@ -42,6 +42,7 @@ All enums use `#[repr(u8)]` for compact memory layout (1 byte each) and include
 - **Helpers**: `is_*()` and `opposite()` methods on applicable types
 - **Parsing**: `FromStr`, `TryFrom<&str>`, `TryFrom<u8>` on every enum
   (case-insensitive string parsing, discriminant-based `u8` conversion)
+- **`no_std`**: Compiles without `std`; only `alloc` is required
 
 ### Installation
 

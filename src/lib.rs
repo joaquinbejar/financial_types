@@ -1,3 +1,5 @@
+#![cfg_attr(not(any(feature = "std", test)), no_std)]
+
 //! # Financial Types
 //!
 //! Core financial type definitions for trading systems.
@@ -21,6 +23,19 @@
 //!   returning [`ParseEnumError`] on failure. String parsing is
 //!   case-insensitive and trims whitespace.
 //!
+//! ## `no_std`
+//!
+//! The crate compiles in `no_std` environments. Disable default features:
+//!
+//! ```toml
+//! [dependencies]
+//! financial_types = { version = "0.1", default-features = false }
+//! ```
+//!
+//! The `alloc` crate is always required (used by `ParseEnumError`).
+//! Re-enable the `std` feature to opt into `std::error::Error`-style
+//! integration that pulls in `serde/std`.
+//!
 //! ## Usage
 //!
 //! ```rust
@@ -41,11 +56,14 @@
 //! assert!(action.is_buy());
 //! ```
 
+extern crate alloc;
+
 pub mod prelude;
 
+use alloc::string::{String, ToString};
+use core::fmt;
+use core::str::FromStr;
 use serde::{Deserialize, Serialize};
-use std::fmt;
-use std::str::FromStr;
 
 /// Error returned when a string or `u8` cannot be converted into one of the
 /// public financial enums defined by this crate.
@@ -105,7 +123,7 @@ impl fmt::Display for ParseEnumError {
     }
 }
 
-impl std::error::Error for ParseEnumError {}
+impl core::error::Error for ParseEnumError {}
 
 /// Classification of the underlying asset for a financial instrument.
 ///
