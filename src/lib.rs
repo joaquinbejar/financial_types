@@ -191,6 +191,19 @@ impl UnderlyingAssetType {
             Self::Other => "Other",
         }
     }
+
+    /// All variants in discriminant order.
+    ///
+    /// Useful for iteration, UI dropdowns, exhaustive validation, and
+    /// schema generation. Order matches the `#[repr(u8)]` values.
+    pub const ALL: &'static [Self] = &[
+        Self::Crypto,
+        Self::Stock,
+        Self::Forex,
+        Self::Commodity,
+        Self::Bond,
+        Self::Other,
+    ];
 }
 
 impl fmt::Display for UnderlyingAssetType {
@@ -301,6 +314,9 @@ impl Action {
             Self::Other => "Other",
         }
     }
+
+    /// All variants in discriminant order.
+    pub const ALL: &'static [Self] = &[Self::Buy, Self::Sell, Self::Other];
 }
 
 impl fmt::Display for Action {
@@ -418,6 +434,9 @@ impl Side {
             Self::Short => "Short",
         }
     }
+
+    /// All variants in discriminant order.
+    pub const ALL: &'static [Self] = &[Self::Long, Self::Short];
 }
 
 impl fmt::Display for Side {
@@ -546,6 +565,9 @@ impl OptionStyle {
             Self::Put => "Put",
         }
     }
+
+    /// All variants in discriminant order.
+    pub const ALL: &'static [Self] = &[Self::Call, Self::Put];
 }
 
 impl fmt::Display for OptionStyle {
@@ -784,6 +806,25 @@ mod tests_underlying_asset_type {
         const STOCK: &str = UnderlyingAssetType::Stock.as_str();
         assert_eq!(STOCK, "Stock");
     }
+
+    #[test]
+    fn test_all_variants_ordered() {
+        assert_eq!(
+            UnderlyingAssetType::ALL,
+            &[
+                UnderlyingAssetType::Crypto,
+                UnderlyingAssetType::Stock,
+                UnderlyingAssetType::Forex,
+                UnderlyingAssetType::Commodity,
+                UnderlyingAssetType::Bond,
+                UnderlyingAssetType::Other,
+            ]
+        );
+        for (index, variant) in UnderlyingAssetType::ALL.iter().enumerate() {
+            let round = UnderlyingAssetType::try_from(index as u8).unwrap();
+            assert_eq!(round, *variant);
+        }
+    }
 }
 
 #[cfg(test)]
@@ -877,6 +918,11 @@ mod tests_action {
     fn test_as_str_is_const() {
         const BUY: &str = Action::Buy.as_str();
         assert_eq!(BUY, "Buy");
+    }
+
+    #[test]
+    fn test_all_variants_ordered() {
+        assert_eq!(Action::ALL, &[Action::Buy, Action::Sell, Action::Other]);
     }
 }
 
@@ -990,6 +1036,11 @@ mod tests_side {
     fn test_as_str_is_const() {
         const LONG: &str = Side::Long.as_str();
         assert_eq!(LONG, "Long");
+    }
+
+    #[test]
+    fn test_all_variants_ordered() {
+        assert_eq!(Side::ALL, &[Side::Long, Side::Short]);
     }
 }
 
@@ -1107,6 +1158,11 @@ mod tests_option_style {
     fn test_as_str_is_const() {
         const CALL: &str = OptionStyle::Call.as_str();
         assert_eq!(CALL, "Call");
+    }
+
+    #[test]
+    fn test_all_variants_ordered() {
+        assert_eq!(OptionStyle::ALL, &[OptionStyle::Call, OptionStyle::Put]);
     }
 }
 

@@ -16,6 +16,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `TryFrom<u8>` uses the documented `#[repr(u8)]` discriminants.
 - `const fn as_str()` on every public enum returning a `&'static str`
   matching the `Display` output. Zero-allocation alternative to `format!`.
+- `pub const ALL: &'static [Self]` on every public enum, listing every
+  variant in `#[repr(u8)]` discriminant order. Useful for iteration,
+  validation, and UI generation.
 
 ### Changed
 
