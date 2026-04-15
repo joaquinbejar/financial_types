@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Internal
+
+- `.gitignore` cleanup: removed contradictory commented-out entry for
+  `Cargo.lock`, kept the single authoritative ignore line, documented
+  the rationale (library crate). `Cargo.lock` was already untracked.
+
 ### Changed
 
 - `missing_docs` upgraded from `warn` to `deny`. Adds
