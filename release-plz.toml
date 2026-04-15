@@ -1,0 +1,49 @@
+# release-plz configuration for financial_types
+# https://release-plz.ieni.dev/docs/config
+
+[workspace]
+# Maintain a Keep-a-Changelog-style changelog driven by Conventional
+# Commits. Already documented under `[Unreleased]` in CHANGELOG.md.
+changelog_update = true
+changelog_path = "CHANGELOG.md"
+# Open a single release PR per release. Merging it tags, creates the
+# GitHub release, and publishes to crates.io.
+release_commits = "^(feat|fix|perf|refactor|docs|build|deps)(\\(.*\\))?!?:"
+git_release_enable = true
+git_tag_enable = true
+publish = true
+semver_check = true
+# Keep pre-1.0 semver discipline: breaking = minor, additive = patch.
+# Flip this off and retag 1.0.0 when the public API stabilises.
+
+[changelog]
+header = """# Changelog
+
+All notable changes to `financial_types` are documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+"""
+body = """
+
+## [{{ version | trim_start_matches(pat="v") }}] - {{ timestamp | date(format="%Y-%m-%d") }}
+{% for group, commits in commits | group_by(attribute="group") %}
+### {{ group | upper_first }}
+{% for commit in commits %}
+- {{ commit.message | upper_first }}\
+{% endfor %}
+{% endfor %}"""
+commit_parsers = [
+    { message = "^feat", group = "Added" },
+    { message = "^fix", group = "Fixed" },
+    { message = "^perf", group = "Changed" },
+    { message = "^refactor", group = "Internal" },
+    { message = "^docs", group = "Internal" },
+    { message = "^build", group = "Internal" },
+    { message = "^deps", group = "Internal" },
+    { message = ".*!", group = "Changed" },
+    { message = "^chore", skip = true },
+    { message = "^ci", skip = true },
+    { message = "^test", skip = true },
+    { message = "^style", skip = true },
+]
