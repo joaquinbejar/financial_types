@@ -169,6 +169,10 @@ assert_eq!(Side::try_from(0u8).unwrap(), Side::Long);
 assert!(Side::try_from(9u8).is_err());
 ```
 
+### Changelog
+
+See [`CHANGELOG.md`](./CHANGELOG.md) for the full history of releases.
+
 ### License
 
 This project is licensed under the MIT License.
