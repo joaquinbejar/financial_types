@@ -139,7 +139,9 @@ impl core::error::Error for ParseEnumError {}
 /// assert_eq!(asset, UnderlyingAssetType::Stock);
 /// assert_eq!(format!("{asset}"), "Stock");
 /// ```
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default, Serialize, Deserialize,
+)]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[repr(u8)]
 pub enum UnderlyingAssetType {
@@ -292,7 +294,9 @@ impl TryFrom<u8> for UnderlyingAssetType {
 /// assert!(action.is_buy());
 /// assert_eq!(format!("{action}"), "Buy");
 /// ```
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default, Serialize, Deserialize,
+)]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[repr(u8)]
 pub enum Action {
@@ -413,7 +417,7 @@ impl TryFrom<u8> for Action {
 /// assert!(!side.is_short());
 /// assert_eq!(format!("{side}"), "Long");
 /// ```
-#[derive(Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default, Serialize, Deserialize)]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[repr(u8)]
 pub enum Side {
@@ -858,6 +862,27 @@ mod tests_underlying_asset_type {
             assert_eq!(round, *variant);
         }
     }
+
+    #[test]
+    fn test_ord_matches_discriminants() {
+        let mut v = vec![
+            UnderlyingAssetType::Other,
+            UnderlyingAssetType::Crypto,
+            UnderlyingAssetType::Bond,
+            UnderlyingAssetType::Stock,
+        ];
+        v.sort();
+        assert_eq!(
+            v,
+            vec![
+                UnderlyingAssetType::Crypto,
+                UnderlyingAssetType::Stock,
+                UnderlyingAssetType::Bond,
+                UnderlyingAssetType::Other,
+            ]
+        );
+        assert!(UnderlyingAssetType::Crypto < UnderlyingAssetType::Stock);
+    }
 }
 
 #[cfg(test)]
@@ -967,6 +992,12 @@ mod tests_action {
         for v in Action::ALL {
             assert_eq!(v.opposite().opposite(), *v);
         }
+    }
+
+    #[test]
+    fn test_ord_matches_discriminants() {
+        assert!(Action::Buy < Action::Sell);
+        assert!(Action::Sell < Action::Other);
     }
 }
 
@@ -1085,6 +1116,11 @@ mod tests_side {
     #[test]
     fn test_all_variants_ordered() {
         assert_eq!(Side::ALL, &[Side::Long, Side::Short]);
+    }
+
+    #[test]
+    fn test_ord_matches_discriminants() {
+        assert!(Side::Long < Side::Short);
     }
 }
 
