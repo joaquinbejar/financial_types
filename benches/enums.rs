@@ -4,8 +4,9 @@
 
 #![allow(missing_docs)]
 
-use criterion::{Criterion, black_box, criterion_group, criterion_main};
+use criterion::{Criterion, criterion_group, criterion_main};
 use financial_types::{Action, OptionStyle, Side, UnderlyingAssetType};
+use std::hint::black_box;
 use std::str::FromStr;
 
 fn bench_as_str(c: &mut Criterion) {
