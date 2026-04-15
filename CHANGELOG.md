@@ -40,6 +40,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   on every public enum (uniform `prop_oneof` over variants). Enables
   property-based testing of code that consumes these types.
 
+### Internal
+
+- Moved per-enum unit tests into a dedicated `tests/` integration
+  directory. Each test now exercises only the public API surface,
+  matching how downstream consumers use the crate.
+
 ## [0.1.0] - 2025-01-01
 
 ### Added
