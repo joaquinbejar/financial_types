@@ -317,6 +317,21 @@ impl Action {
 
     /// All variants in discriminant order.
     pub const ALL: &'static [Self] = &[Self::Buy, Self::Sell, Self::Other];
+
+    /// Returns the opposite trading action.
+    ///
+    /// - `Buy` → `Sell`
+    /// - `Sell` → `Buy`
+    /// - `Other` → `Other` (no meaningful inverse)
+    #[must_use]
+    #[inline]
+    pub const fn opposite(&self) -> Self {
+        match self {
+            Self::Buy => Self::Sell,
+            Self::Sell => Self::Buy,
+            Self::Other => Self::Other,
+        }
+    }
 }
 
 impl fmt::Display for Action {
@@ -923,6 +938,17 @@ mod tests_action {
     #[test]
     fn test_all_variants_ordered() {
         assert_eq!(Action::ALL, &[Action::Buy, Action::Sell, Action::Other]);
+    }
+
+    #[test]
+    fn test_opposite() {
+        assert_eq!(Action::Buy.opposite(), Action::Sell);
+        assert_eq!(Action::Sell.opposite(), Action::Buy);
+        assert_eq!(Action::Other.opposite(), Action::Other);
+        // Symmetry
+        for v in Action::ALL {
+            assert_eq!(v.opposite().opposite(), *v);
+        }
     }
 }
 
