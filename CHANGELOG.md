@@ -34,6 +34,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Derives `PartialOrd, Ord` on `UnderlyingAssetType`, `Action`, and
   `Side` (previously only `OptionStyle`). Ordering follows the
   documented `#[repr(u8)]` discriminants and is non-breaking.
+- Optional `arbitrary` feature deriving `arbitrary::Arbitrary` on every
+  public enum.
+- Optional `proptest` feature implementing `proptest::arbitrary::Arbitrary`
+  on every public enum (uniform `prop_oneof` over variants). Enables
+  property-based testing of code that consumes these types.
 
 ## [0.1.0] - 2025-01-01
 

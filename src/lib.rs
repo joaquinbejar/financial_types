@@ -143,6 +143,7 @@ impl core::error::Error for ParseEnumError {}
     Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default, Serialize, Deserialize,
 )]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[cfg_attr(feature = "arbitrary", derive(arbitrary::Arbitrary))]
 #[repr(u8)]
 pub enum UnderlyingAssetType {
     /// Cryptocurrency assets (e.g., BTC, ETH).
@@ -298,6 +299,7 @@ impl TryFrom<u8> for UnderlyingAssetType {
     Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default, Serialize, Deserialize,
 )]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[cfg_attr(feature = "arbitrary", derive(arbitrary::Arbitrary))]
 #[repr(u8)]
 pub enum Action {
     /// Represents a purchase transaction, where assets are acquired.
@@ -419,6 +421,7 @@ impl TryFrom<u8> for Action {
 /// ```
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default, Serialize, Deserialize)]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[cfg_attr(feature = "arbitrary", derive(arbitrary::Arbitrary))]
 #[repr(u8)]
 pub enum Side {
     /// Profits when the underlying asset's price increases.
@@ -550,6 +553,7 @@ impl TryFrom<u8> for Side {
 /// ```
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default, Serialize, Deserialize)]
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[cfg_attr(feature = "arbitrary", derive(arbitrary::Arbitrary))]
 #[repr(u8)]
 pub enum OptionStyle {
     /// A call option gives the holder the right (but not obligation) to **buy**
@@ -1261,5 +1265,113 @@ mod tests_parse_enum_error {
     fn test_error_trait() {
         let err = ParseEnumError::new("Action", "hold");
         let _: &dyn std::error::Error = &err;
+    }
+}
+
+#[cfg(feature = "proptest")]
+mod proptest_support {
+    use super::{Action, OptionStyle, Side, UnderlyingAssetType};
+    use proptest::prelude::*;
+
+    impl Arbitrary for UnderlyingAssetType {
+        type Parameters = ();
+        type Strategy = BoxedStrategy<Self>;
+
+        fn arbitrary_with(_: Self::Parameters) -> Self::Strategy {
+            prop_oneof![
+                Just(Self::Crypto),
+                Just(Self::Stock),
+                Just(Self::Forex),
+                Just(Self::Commodity),
+                Just(Self::Bond),
+                Just(Self::Other),
+            ]
+            .boxed()
+        }
+    }
+
+    impl Arbitrary for Action {
+        type Parameters = ();
+        type Strategy = BoxedStrategy<Self>;
+
+        fn arbitrary_with(_: Self::Parameters) -> Self::Strategy {
+            prop_oneof![Just(Self::Buy), Just(Self::Sell), Just(Self::Other)].boxed()
+        }
+    }
+
+    impl Arbitrary for Side {
+        type Parameters = ();
+        type Strategy = BoxedStrategy<Self>;
+
+        fn arbitrary_with(_: Self::Parameters) -> Self::Strategy {
+            prop_oneof![Just(Self::Long), Just(Self::Short)].boxed()
+        }
+    }
+
+    impl Arbitrary for OptionStyle {
+        type Parameters = ();
+        type Strategy = BoxedStrategy<Self>;
+
+        fn arbitrary_with(_: Self::Parameters) -> Self::Strategy {
+            prop_oneof![Just(Self::Call), Just(Self::Put)].boxed()
+        }
+    }
+}
+
+#[cfg(all(test, feature = "proptest"))]
+#[allow(clippy::unwrap_used)]
+mod tests_proptest {
+    use super::*;
+    use proptest::prelude::*;
+
+    proptest! {
+        #[test]
+        fn prop_side_serde_roundtrip(side: Side) {
+            let json = serde_json::to_string(&side).unwrap();
+            let back: Side = serde_json::from_str(&json).unwrap();
+            prop_assert_eq!(side, back);
+        }
+
+        #[test]
+        fn prop_action_display_parse_roundtrip(action: Action) {
+            let parsed: Action = action.as_str().parse().unwrap();
+            prop_assert_eq!(action, parsed);
+        }
+
+        #[test]
+        fn prop_underlying_asset_u8_roundtrip(asset: UnderlyingAssetType) {
+            let pos = UnderlyingAssetType::ALL
+                .iter()
+                .position(|v| v == &asset)
+                .unwrap();
+            let back = UnderlyingAssetType::try_from(pos as u8).unwrap();
+            prop_assert_eq!(asset, back);
+        }
+
+        #[test]
+        fn prop_option_style_opposite_involution(style: OptionStyle) {
+            prop_assert_eq!(style.opposite().opposite(), style);
+        }
+    }
+}
+
+#[cfg(all(test, feature = "arbitrary"))]
+#[allow(clippy::unwrap_used)]
+mod tests_arbitrary {
+    use super::*;
+    use arbitrary::{Arbitrary, Unstructured};
+
+    #[test]
+    fn test_arbitrary_side() {
+        let raw = [0u8, 1, 2, 3, 4, 5, 6, 7];
+        let mut u = Unstructured::new(&raw);
+        let _ = Side::arbitrary(&mut u).unwrap();
+    }
+
+    #[test]
+    fn test_arbitrary_action() {
+        let raw = [0u8, 1, 2, 3, 4];
+        let mut u = Unstructured::new(&raw);
+        let _ = Action::arbitrary(&mut u).unwrap();
     }
 }

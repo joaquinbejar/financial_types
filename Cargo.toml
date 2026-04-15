@@ -15,10 +15,14 @@ categories = ["finance", "data-structures"]
 default = ["std"]
 std = ["serde/std"]
 utoipa = ["dep:utoipa", "std"]
+arbitrary = ["dep:arbitrary", "std"]
+proptest = ["dep:proptest", "std"]
 
 [dependencies]
 serde = { version = "1.0", default-features = false, features = ["derive", "alloc"] }
 utoipa = { version = "5.4", optional = true }
+arbitrary = { version = "1.4", optional = true, features = ["derive"] }
+proptest = { version = "1.5", optional = true }
 
 [dev-dependencies]
 serde_json = { version = "1.0" }
