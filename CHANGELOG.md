@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `rust-version = "1.85"` declared in `Cargo.toml`. New CI job
+  (`.github/workflows/msrv.yml`) builds and tests on the exact MSRV.
+  Bumping MSRV is a minor version change.
+
 ### Internal
 
 - `.gitignore` cleanup: removed contradictory commented-out entry for
