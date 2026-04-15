@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `release-plz` automation: `release-plz.toml` + workflow at
+  `.github/workflows/release-plz.yml`. Every push to `main` opens or
+  updates a release PR; merging it tags, releases on GitHub, and runs
+  `cargo publish`. CONTRIBUTING documents the flow.
 - `cargo-mutants` CI workflow (`.github/workflows/mutants.yml`).
   Runs on every PR (changed paths) and full sweep on Sundays.
   Unkilled mutants surface untested branches.

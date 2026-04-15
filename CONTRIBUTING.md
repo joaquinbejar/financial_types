@@ -70,6 +70,26 @@ cargo mutants --no-shuffle -j 2 --all-features --timeout 120
 
 The report lands in `mutants.out/`.
 
+## Releases
+
+Releases are automated via [`release-plz`](https://release-plz.ieni.dev/).
+Every push to `main` runs two jobs:
+
+1. **release-pr** — if the release PR doesn't exist yet, opens one that
+   bumps `Cargo.toml`, refreshes `CHANGELOG.md` from Conventional
+   Commits, and prepares the release notes.
+2. **release** — if a tagged version is not yet on crates.io, tags
+   `vX.Y.Z`, creates the GitHub release, and runs `cargo publish`.
+
+To cut a release: land changes via conventional-commit messages
+(`feat:`, `fix:`, `feat!:` for breaking, etc.), then merge the
+release PR that `release-plz` opens. Manual releases are discouraged;
+use this flow for every version bump.
+
+Secret `CARGO_REGISTRY_TOKEN` must be set at the repository level
+(maintainer action). Without it, `release-plz release` will open the
+GitHub release but skip `cargo publish`.
+
 ## Coding standards
 
 - Preserve `#[repr(u8)]` on every public enum. Assert the 1-byte size
