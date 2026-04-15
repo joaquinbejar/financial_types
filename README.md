@@ -219,6 +219,18 @@ cargo run --example serde_roundtrip
 cargo run --example utoipa_schema --features utoipa
 ```
 
+### Benchmarks
+
+Hot-path criterion benchmarks live in [`benches/enums.rs`](./benches/enums.rs)
+covering `as_str`, `Display`, `FromStr`, `TryFrom<u8>`, serde JSON
+round-trip, and `is_*` helpers for every public enum.
+
+```bash
+cargo bench
+```
+
+HTML reports land under `target/criterion/`.
+
 ### Changelog
 
 See [`CHANGELOG.md`](./CHANGELOG.md) for the full history of releases.

@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Criterion benchmark suite at `benches/enums.rs` covering `as_str`,
+  `Display`, `FromStr`, `TryFrom<u8>`, serde round-trip, and `is_*`
+  helpers for every public enum. Run with `cargo bench`.
 - `release-plz` automation: `release-plz.toml` + workflow at
   `.github/workflows/release-plz.yml`. Every push to `main` opens or
   updates a release PR; merging it tags, releases on GitHub, and runs

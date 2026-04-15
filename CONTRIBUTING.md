@@ -90,6 +90,19 @@ Secret `CARGO_REGISTRY_TOKEN` must be set at the repository level
 (maintainer action). Without it, `release-plz release` will open the
 GitHub release but skip `cargo publish`.
 
+## Benchmarks
+
+`benches/enums.rs` is a criterion suite covering every hot-path helper.
+Run locally:
+
+```bash
+cargo bench
+```
+
+HTML reports land under `target/criterion/`. Benchmarks are not run in
+regular CI — invoke on demand when changing anything performance-
+sensitive (`as_str`, `Display`, `FromStr`, `TryFrom`).
+
 ## Coding standards
 
 - Preserve `#[repr(u8)]` on every public enum. Assert the 1-byte size
