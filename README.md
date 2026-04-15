@@ -8,6 +8,7 @@
 [![Lint](https://github.com/joaquinbejar/financial_types/actions/workflows/lint.yml/badge.svg?branch=main)](https://github.com/joaquinbejar/financial_types/actions/workflows/lint.yml)
 [![Format](https://github.com/joaquinbejar/financial_types/actions/workflows/format_check.yml/badge.svg?branch=main)](https://github.com/joaquinbejar/financial_types/actions/workflows/format_check.yml)
 [![Audit](https://github.com/joaquinbejar/financial_types/actions/workflows/audit.yml/badge.svg?branch=main)](https://github.com/joaquinbejar/financial_types/actions/workflows/audit.yml)
+[![Deny](https://github.com/joaquinbejar/financial_types/actions/workflows/deny.yml/badge.svg?branch=main)](https://github.com/joaquinbejar/financial_types/actions/workflows/deny.yml)
 [![Semver](https://github.com/joaquinbejar/financial_types/actions/workflows/semver.yml/badge.svg?branch=main)](https://github.com/joaquinbejar/financial_types/actions/workflows/semver.yml)
 [![Coverage](https://github.com/joaquinbejar/financial_types/actions/workflows/code_coverage.yml/badge.svg?branch=main)](https://github.com/joaquinbejar/financial_types/actions/workflows/code_coverage.yml)
 [![codecov](https://codecov.io/gh/joaquinbejar/financial_types/branch/main/graph/badge.svg)](https://codecov.io/gh/joaquinbejar/financial_types)

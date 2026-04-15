@@ -13,6 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `cargo-deny` CI workflow (`.github/workflows/deny.yml`) and root
+  `deny.toml` enforcing license allow-list (MIT, Apache-2.0,
+  BSD-2/3-Clause, ISC, Unicode, Zlib, MPL-2.0, CC0-1.0), advisory
+  scanning, banned-deps (denies `option_type`, `positive`,
+  `expiration_date` to prevent dependency cycles), and registry
+  allow-listing (crates.io only).
 - `rust-version = "1.85"` declared in `Cargo.toml`. New CI job
   (`.github/workflows/msrv.yml`) builds and tests on the exact MSRV.
   Bumping MSRV is a minor version change.
