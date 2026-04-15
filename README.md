@@ -52,15 +52,35 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-financial_types = "0.1"
+financial_types = "0.2"
 ```
 
 To enable OpenAPI schema support:
 
 ```toml
 [dependencies]
-financial_types = { version = "0.1", features = ["utoipa"] }
+financial_types = { version = "0.2", features = ["utoipa"] }
 ```
+
+### Migration: 0.1 → 0.2
+
+`UnderlyingAssetType` and `Action` are now `#[non_exhaustive]`.
+Exhaustive `match` expressions on either enum must include a wildcard
+arm:
+
+```rust
+use financial_types::Action;
+
+let action = Action::Buy;
+match action {
+    Action::Buy => { /* ... */ }
+    Action::Sell => { /* ... */ }
+    Action::Other => { /* ... */ }
+    _ => { /* future variants */ }
+}
+```
+
+`Side` and `OptionStyle` remain exhaustive — no migration needed.
 
 ### Quick Start
 
