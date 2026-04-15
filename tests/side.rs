@@ -91,6 +91,16 @@ fn test_try_from_u8() {
 }
 
 #[test]
+fn test_try_from_str() {
+    // Asserts non-default variant — kills mutants that replace the
+    // body with `Ok(Default::default())` (which would yield Long).
+    let short: Side = "Short".try_into().unwrap();
+    assert_eq!(short, Side::Short);
+    let err = <Side as TryFrom<&str>>::try_from("nope").unwrap_err();
+    assert_eq!(err.kind(), "Side");
+}
+
+#[test]
 fn test_display_parse_roundtrip() {
     for variant in [Side::Long, Side::Short] {
         let parsed: Side = format!("{variant}").parse().unwrap();

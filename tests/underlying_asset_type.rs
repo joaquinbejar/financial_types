@@ -28,6 +28,16 @@ fn test_is_helpers() {
     assert!(UnderlyingAssetType::Bond.is_bond());
     assert!(!UnderlyingAssetType::Other.is_stock());
     assert!(!UnderlyingAssetType::Stock.is_crypto());
+    // Negative coverage for every helper — kills mutants that
+    // replace the body with `true`.
+    assert!(!UnderlyingAssetType::Stock.is_forex());
+    assert!(!UnderlyingAssetType::Stock.is_commodity());
+    assert!(!UnderlyingAssetType::Stock.is_bond());
+    assert!(!UnderlyingAssetType::Crypto.is_stock());
+    assert!(!UnderlyingAssetType::Other.is_crypto());
+    assert!(!UnderlyingAssetType::Other.is_forex());
+    assert!(!UnderlyingAssetType::Other.is_commodity());
+    assert!(!UnderlyingAssetType::Other.is_bond());
 }
 
 #[test]

@@ -95,6 +95,16 @@ fn test_try_from_u8() {
 }
 
 #[test]
+fn test_try_from_str() {
+    // Asserts non-default variant — kills mutants that replace the
+    // body with `Ok(Default::default())` (which would yield Call).
+    let put: OptionStyle = "Put".try_into().unwrap();
+    assert_eq!(put, OptionStyle::Put);
+    let err = <OptionStyle as TryFrom<&str>>::try_from("nope").unwrap_err();
+    assert_eq!(err.kind(), "OptionStyle");
+}
+
+#[test]
 fn test_display_parse_roundtrip() {
     for variant in [OptionStyle::Call, OptionStyle::Put] {
         let parsed: OptionStyle = format!("{variant}").parse().unwrap();

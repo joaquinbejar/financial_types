@@ -72,6 +72,18 @@ fn test_try_from_u8() {
 }
 
 #[test]
+fn test_try_from_str() {
+    // Asserts non-default variant — kills mutants that replace the
+    // body with `Ok(Default::default())` (which would yield Buy).
+    let sell: Action = "Sell".try_into().unwrap();
+    assert_eq!(sell, Action::Sell);
+    let other: Action = "other".try_into().unwrap();
+    assert_eq!(other, Action::Other);
+    let err = <Action as TryFrom<&str>>::try_from("nope").unwrap_err();
+    assert_eq!(err.kind(), "Action");
+}
+
+#[test]
 fn test_display_parse_roundtrip() {
     for variant in [Action::Buy, Action::Sell, Action::Other] {
         let parsed: Action = format!("{variant}").parse().unwrap();
