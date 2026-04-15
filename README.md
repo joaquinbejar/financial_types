@@ -40,6 +40,8 @@ All enums use `#[repr(u8)]` for compact memory layout (1 byte each) and include
 - **Serde**: Full serialization/deserialization support
 - **OpenAPI**: Optional `utoipa` support via feature flag
 - **Helpers**: `is_*()` and `opposite()` methods on applicable types
+- **Parsing**: `FromStr`, `TryFrom<&str>`, `TryFrom<u8>` on every enum
+  (case-insensitive string parsing, discriminant-based `u8` conversion)
 
 ### Installation
 
@@ -142,6 +144,26 @@ let side = Side::Long;
 let json = serde_json::to_string(&side).unwrap();  // "\"Long\""
 let parsed: Side = serde_json::from_str(&json).unwrap();
 assert_eq!(side, parsed);
+```
+
+#### Parsing
+
+```rust
+use financial_types::{Action, Side, UnderlyingAssetType};
+use std::str::FromStr;
+
+// FromStr — case-insensitive, trims whitespace
+assert_eq!(Side::from_str("Long").unwrap(), Side::Long);
+assert_eq!(Side::from_str("  short  ").unwrap(), Side::Short);
+assert_eq!("SELL".parse::<Action>().unwrap(), Action::Sell);
+
+// TryFrom<&str>
+let asset: UnderlyingAssetType = "Stock".try_into().unwrap();
+assert_eq!(asset, UnderlyingAssetType::Stock);
+
+// TryFrom<u8> — uses #[repr(u8)] discriminants
+assert_eq!(Side::try_from(0u8).unwrap(), Side::Long);
+assert!(Side::try_from(9u8).is_err());
 ```
 
 ### License

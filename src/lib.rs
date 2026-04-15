@@ -17,6 +17,9 @@
 //! - Optional `utoipa` support for OpenAPI schema generation (enable the `utoipa` feature)
 //! - `#[repr(u8)]` on all enums for deterministic layout
 //! - `#[must_use]` on pure helper methods
+//! - `FromStr`, `TryFrom<&str>`, and `TryFrom<u8>` on every public enum,
+//!   returning [`ParseEnumError`] on failure. String parsing is
+//!   case-insensitive and trims whitespace.
 //!
 //! ## Usage
 //!
@@ -42,6 +45,67 @@ pub mod prelude;
 
 use serde::{Deserialize, Serialize};
 use std::fmt;
+use std::str::FromStr;
+
+/// Error returned when a string or `u8` cannot be converted into one of the
+/// public financial enums defined by this crate.
+///
+/// This is the error type produced by `FromStr`, `TryFrom<&str>`, and
+/// `TryFrom<u8>` implementations on [`UnderlyingAssetType`], [`Action`],
+/// [`Side`], and [`OptionStyle`].
+///
+/// # Examples
+///
+/// ```rust
+/// use financial_types::{Side, ParseEnumError};
+/// use std::str::FromStr;
+///
+/// let err = Side::from_str("sideways").unwrap_err();
+/// assert_eq!(err.kind(), "Side");
+/// ```
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+pub struct ParseEnumError {
+    /// Name of the enum that failed to parse (e.g. `"Side"`).
+    kind: &'static str,
+    /// Human-readable description of the invalid input.
+    input: String,
+}
+
+impl ParseEnumError {
+    /// Creates a new [`ParseEnumError`].
+    #[must_use]
+    #[inline]
+    pub fn new(kind: &'static str, input: impl Into<String>) -> Self {
+        Self {
+            kind,
+            input: input.into(),
+        }
+    }
+
+    /// Returns the name of the enum that failed to parse.
+    #[must_use]
+    #[inline]
+    pub const fn kind(&self) -> &'static str {
+        self.kind
+    }
+
+    /// Returns the original (stringified) input that was rejected.
+    #[must_use]
+    #[inline]
+    pub fn input(&self) -> &str {
+        &self.input
+    }
+}
+
+impl fmt::Display for ParseEnumError {
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "invalid {} value: {:?}", self.kind, self.input)
+    }
+}
+
+impl std::error::Error for ParseEnumError {}
 
 /// Classification of the underlying asset for a financial instrument.
 ///
@@ -127,6 +191,52 @@ impl fmt::Display for UnderlyingAssetType {
     }
 }
 
+impl FromStr for UnderlyingAssetType {
+    type Err = ParseEnumError;
+
+    #[inline]
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.trim().to_ascii_lowercase().as_str() {
+            "crypto" => Ok(Self::Crypto),
+            "stock" => Ok(Self::Stock),
+            "forex" => Ok(Self::Forex),
+            "commodity" => Ok(Self::Commodity),
+            "bond" => Ok(Self::Bond),
+            "other" => Ok(Self::Other),
+            _ => Err(ParseEnumError::new("UnderlyingAssetType", s)),
+        }
+    }
+}
+
+impl TryFrom<&str> for UnderlyingAssetType {
+    type Error = ParseEnumError;
+
+    #[inline]
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        Self::from_str(value)
+    }
+}
+
+impl TryFrom<u8> for UnderlyingAssetType {
+    type Error = ParseEnumError;
+
+    #[inline]
+    fn try_from(value: u8) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(Self::Crypto),
+            1 => Ok(Self::Stock),
+            2 => Ok(Self::Forex),
+            3 => Ok(Self::Commodity),
+            4 => Ok(Self::Bond),
+            5 => Ok(Self::Other),
+            other => Err(ParseEnumError::new(
+                "UnderlyingAssetType",
+                other.to_string(),
+            )),
+        }
+    }
+}
+
 /// Represents trading actions in a financial context.
 ///
 /// Defines the fundamental trade operations that can be performed in a
@@ -178,6 +288,43 @@ impl fmt::Display for Action {
             Self::Buy => write!(f, "Buy"),
             Self::Sell => write!(f, "Sell"),
             Self::Other => write!(f, "Other"),
+        }
+    }
+}
+
+impl FromStr for Action {
+    type Err = ParseEnumError;
+
+    #[inline]
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.trim().to_ascii_lowercase().as_str() {
+            "buy" => Ok(Self::Buy),
+            "sell" => Ok(Self::Sell),
+            "other" => Ok(Self::Other),
+            _ => Err(ParseEnumError::new("Action", s)),
+        }
+    }
+}
+
+impl TryFrom<&str> for Action {
+    type Error = ParseEnumError;
+
+    #[inline]
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        Self::from_str(value)
+    }
+}
+
+impl TryFrom<u8> for Action {
+    type Error = ParseEnumError;
+
+    #[inline]
+    fn try_from(value: u8) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(Self::Buy),
+            1 => Ok(Self::Sell),
+            2 => Ok(Self::Other),
+            other => Err(ParseEnumError::new("Action", other.to_string())),
         }
     }
 }
@@ -259,6 +406,41 @@ impl fmt::Debug for Side {
         match self {
             Self::Long => write!(f, "Side::Long"),
             Self::Short => write!(f, "Side::Short"),
+        }
+    }
+}
+
+impl FromStr for Side {
+    type Err = ParseEnumError;
+
+    #[inline]
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.trim().to_ascii_lowercase().as_str() {
+            "long" => Ok(Self::Long),
+            "short" => Ok(Self::Short),
+            _ => Err(ParseEnumError::new("Side", s)),
+        }
+    }
+}
+
+impl TryFrom<&str> for Side {
+    type Error = ParseEnumError;
+
+    #[inline]
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        Self::from_str(value)
+    }
+}
+
+impl TryFrom<u8> for Side {
+    type Error = ParseEnumError;
+
+    #[inline]
+    fn try_from(value: u8) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(Self::Long),
+            1 => Ok(Self::Short),
+            other => Err(ParseEnumError::new("Side", other.to_string())),
         }
     }
 }
@@ -347,6 +529,41 @@ impl fmt::Debug for OptionStyle {
     }
 }
 
+impl FromStr for OptionStyle {
+    type Err = ParseEnumError;
+
+    #[inline]
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.trim().to_ascii_lowercase().as_str() {
+            "call" => Ok(Self::Call),
+            "put" => Ok(Self::Put),
+            _ => Err(ParseEnumError::new("OptionStyle", s)),
+        }
+    }
+}
+
+impl TryFrom<&str> for OptionStyle {
+    type Error = ParseEnumError;
+
+    #[inline]
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        Self::from_str(value)
+    }
+}
+
+impl TryFrom<u8> for OptionStyle {
+    type Error = ParseEnumError;
+
+    #[inline]
+    fn try_from(value: u8) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(Self::Call),
+            1 => Ok(Self::Put),
+            other => Err(ParseEnumError::new("OptionStyle", other.to_string())),
+        }
+    }
+}
+
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::panic, clippy::expect_used)]
 mod tests_underlying_asset_type {
@@ -428,6 +645,89 @@ mod tests_underlying_asset_type {
             "UnderlyingAssetType should be 1 byte with #[repr(u8)]"
         );
     }
+
+    #[test]
+    fn test_from_str_valid() {
+        assert_eq!(
+            "Stock".parse::<UnderlyingAssetType>().unwrap(),
+            UnderlyingAssetType::Stock
+        );
+        assert_eq!(
+            "crypto".parse::<UnderlyingAssetType>().unwrap(),
+            UnderlyingAssetType::Crypto
+        );
+        assert_eq!(
+            "FOREX".parse::<UnderlyingAssetType>().unwrap(),
+            UnderlyingAssetType::Forex
+        );
+        assert_eq!(
+            "  Commodity  ".parse::<UnderlyingAssetType>().unwrap(),
+            UnderlyingAssetType::Commodity
+        );
+    }
+
+    #[test]
+    fn test_from_str_invalid() {
+        let err = "equity".parse::<UnderlyingAssetType>().unwrap_err();
+        assert_eq!(err.kind(), "UnderlyingAssetType");
+        assert_eq!(err.input(), "equity");
+    }
+
+    #[test]
+    fn test_try_from_str() {
+        let asset: UnderlyingAssetType = "Bond".try_into().unwrap();
+        assert_eq!(asset, UnderlyingAssetType::Bond);
+    }
+
+    #[test]
+    fn test_try_from_u8_valid() {
+        assert_eq!(
+            UnderlyingAssetType::try_from(0u8).unwrap(),
+            UnderlyingAssetType::Crypto
+        );
+        assert_eq!(
+            UnderlyingAssetType::try_from(1u8).unwrap(),
+            UnderlyingAssetType::Stock
+        );
+        assert_eq!(
+            UnderlyingAssetType::try_from(2u8).unwrap(),
+            UnderlyingAssetType::Forex
+        );
+        assert_eq!(
+            UnderlyingAssetType::try_from(3u8).unwrap(),
+            UnderlyingAssetType::Commodity
+        );
+        assert_eq!(
+            UnderlyingAssetType::try_from(4u8).unwrap(),
+            UnderlyingAssetType::Bond
+        );
+        assert_eq!(
+            UnderlyingAssetType::try_from(5u8).unwrap(),
+            UnderlyingAssetType::Other
+        );
+    }
+
+    #[test]
+    fn test_try_from_u8_invalid() {
+        let err = UnderlyingAssetType::try_from(99u8).unwrap_err();
+        assert_eq!(err.kind(), "UnderlyingAssetType");
+    }
+
+    #[test]
+    fn test_display_parse_roundtrip() {
+        for variant in [
+            UnderlyingAssetType::Crypto,
+            UnderlyingAssetType::Stock,
+            UnderlyingAssetType::Forex,
+            UnderlyingAssetType::Commodity,
+            UnderlyingAssetType::Bond,
+            UnderlyingAssetType::Other,
+        ] {
+            let s = format!("{variant}");
+            let parsed: UnderlyingAssetType = s.parse().unwrap();
+            assert_eq!(variant, parsed);
+        }
+    }
 }
 
 #[cfg(test)]
@@ -479,6 +779,35 @@ mod tests_action {
             1,
             "Action should be 1 byte with #[repr(u8)]"
         );
+    }
+
+    #[test]
+    fn test_from_str_valid() {
+        assert_eq!("Buy".parse::<Action>().unwrap(), Action::Buy);
+        assert_eq!("sell".parse::<Action>().unwrap(), Action::Sell);
+        assert_eq!("OTHER".parse::<Action>().unwrap(), Action::Other);
+    }
+
+    #[test]
+    fn test_from_str_invalid() {
+        let err = "hold".parse::<Action>().unwrap_err();
+        assert_eq!(err.kind(), "Action");
+    }
+
+    #[test]
+    fn test_try_from_u8() {
+        assert_eq!(Action::try_from(0u8).unwrap(), Action::Buy);
+        assert_eq!(Action::try_from(1u8).unwrap(), Action::Sell);
+        assert_eq!(Action::try_from(2u8).unwrap(), Action::Other);
+        assert!(Action::try_from(3u8).is_err());
+    }
+
+    #[test]
+    fn test_display_parse_roundtrip() {
+        for variant in [Action::Buy, Action::Sell, Action::Other] {
+            let parsed: Action = format!("{variant}").parse().unwrap();
+            assert_eq!(variant, parsed);
+        }
     }
 }
 
@@ -550,6 +879,35 @@ mod tests_side {
             1,
             "Side should be 1 byte with #[repr(u8)]"
         );
+    }
+
+    #[test]
+    fn test_from_str_valid() {
+        assert_eq!("Long".parse::<Side>().unwrap(), Side::Long);
+        assert_eq!("short".parse::<Side>().unwrap(), Side::Short);
+        assert_eq!("LONG".parse::<Side>().unwrap(), Side::Long);
+    }
+
+    #[test]
+    fn test_from_str_invalid() {
+        let err = "sideways".parse::<Side>().unwrap_err();
+        assert_eq!(err.kind(), "Side");
+        assert_eq!(err.input(), "sideways");
+    }
+
+    #[test]
+    fn test_try_from_u8() {
+        assert_eq!(Side::try_from(0u8).unwrap(), Side::Long);
+        assert_eq!(Side::try_from(1u8).unwrap(), Side::Short);
+        assert!(Side::try_from(7u8).is_err());
+    }
+
+    #[test]
+    fn test_display_parse_roundtrip() {
+        for variant in [Side::Long, Side::Short] {
+            let parsed: Side = format!("{variant}").parse().unwrap();
+            assert_eq!(variant, parsed);
+        }
     }
 }
 
@@ -626,5 +984,51 @@ mod tests_option_style {
             1,
             "OptionStyle should be 1 byte with #[repr(u8)]"
         );
+    }
+
+    #[test]
+    fn test_from_str_valid() {
+        assert_eq!("Call".parse::<OptionStyle>().unwrap(), OptionStyle::Call);
+        assert_eq!("put".parse::<OptionStyle>().unwrap(), OptionStyle::Put);
+        assert_eq!("CALL".parse::<OptionStyle>().unwrap(), OptionStyle::Call);
+    }
+
+    #[test]
+    fn test_from_str_invalid() {
+        let err = "straddle".parse::<OptionStyle>().unwrap_err();
+        assert_eq!(err.kind(), "OptionStyle");
+    }
+
+    #[test]
+    fn test_try_from_u8() {
+        assert_eq!(OptionStyle::try_from(0u8).unwrap(), OptionStyle::Call);
+        assert_eq!(OptionStyle::try_from(1u8).unwrap(), OptionStyle::Put);
+        assert!(OptionStyle::try_from(42u8).is_err());
+    }
+
+    #[test]
+    fn test_display_parse_roundtrip() {
+        for variant in [OptionStyle::Call, OptionStyle::Put] {
+            let parsed: OptionStyle = format!("{variant}").parse().unwrap();
+            assert_eq!(variant, parsed);
+        }
+    }
+}
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic, clippy::expect_used)]
+mod tests_parse_enum_error {
+    use super::*;
+
+    #[test]
+    fn test_display() {
+        let err = ParseEnumError::new("Side", "sideways");
+        assert_eq!(format!("{err}"), "invalid Side value: \"sideways\"");
+    }
+
+    #[test]
+    fn test_error_trait() {
+        let err = ParseEnumError::new("Action", "hold");
+        let _: &dyn std::error::Error = &err;
     }
 }

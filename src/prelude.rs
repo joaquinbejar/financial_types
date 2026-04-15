@@ -10,5 +10,6 @@
 
 pub use crate::Action;
 pub use crate::OptionStyle;
+pub use crate::ParseEnumError;
 pub use crate::Side;
 pub use crate::UnderlyingAssetType;
