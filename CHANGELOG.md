@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- `missing_docs` upgraded from `warn` to `deny`. Adds
+  `rustdoc::broken_intra_doc_links = "deny"`. Documentation on every
+  public item is now a hard CI gate.
+
 ### Added
 
 - README badge strip: crates.io, docs.rs, license, downloads, per-workflow
