@@ -37,6 +37,8 @@
 //! | `UnderlyingAssetType` | `Commodity` | `"Commodity"` |
 //! | `UnderlyingAssetType` | `Bond`      | `"Bond"`      |
 //! | `UnderlyingAssetType` | `Other`     | `"Other"`     |
+//! | `UnderlyingAssetType` | `Future`    | `"Future"`    |
+//! | `UnderlyingAssetType` | `Forward`   | `"Forward"`   |
 //! | `Action`              | `Buy`       | `"Buy"`       |
 //! | `Action`              | `Sell`      | `"Sell"`      |
 //! | `Action`              | `Other`     | `"Other"`     |
@@ -188,6 +190,16 @@ pub enum UnderlyingAssetType {
     Bond = 4,
     /// Other asset types not covered by the above categories.
     Other = 5,
+    /// Exchange-traded futures contract (e.g., ES, CL, ZB).
+    ///
+    /// Used to mark options whose underlying is a futures price `F`
+    /// rather than a spot price `S` (see Black-76 model).
+    Future = 6,
+    /// OTC / bilateral forward contract on any underlying.
+    ///
+    /// Used to mark options whose underlying is a forward price `F`
+    /// rather than a spot price `S` (see Black-76 model).
+    Forward = 7,
 }
 
 impl UnderlyingAssetType {
@@ -226,6 +238,20 @@ impl UnderlyingAssetType {
         matches!(self, Self::Bond)
     }
 
+    /// Returns `true` if this is a [`Future`](Self::Future) variant.
+    #[must_use]
+    #[inline]
+    pub const fn is_future(&self) -> bool {
+        matches!(self, Self::Future)
+    }
+
+    /// Returns `true` if this is a [`Forward`](Self::Forward) variant.
+    #[must_use]
+    #[inline]
+    pub const fn is_forward(&self) -> bool {
+        matches!(self, Self::Forward)
+    }
+
     /// Returns the canonical string representation of this variant.
     ///
     /// Matches the [`fmt::Display`] output exactly and is allocation-free.
@@ -239,6 +265,8 @@ impl UnderlyingAssetType {
             Self::Commodity => "Commodity",
             Self::Bond => "Bond",
             Self::Other => "Other",
+            Self::Future => "Future",
+            Self::Forward => "Forward",
         }
     }
 
@@ -253,6 +281,8 @@ impl UnderlyingAssetType {
         Self::Commodity,
         Self::Bond,
         Self::Other,
+        Self::Future,
+        Self::Forward,
     ];
 }
 
@@ -275,6 +305,8 @@ impl FromStr for UnderlyingAssetType {
             "commodity" => Ok(Self::Commodity),
             "bond" => Ok(Self::Bond),
             "other" => Ok(Self::Other),
+            "future" => Ok(Self::Future),
+            "forward" => Ok(Self::Forward),
             _ => Err(ParseEnumError::new("UnderlyingAssetType", s)),
         }
     }
@@ -301,6 +333,8 @@ impl TryFrom<u8> for UnderlyingAssetType {
             3 => Ok(Self::Commodity),
             4 => Ok(Self::Bond),
             5 => Ok(Self::Other),
+            6 => Ok(Self::Future),
+            7 => Ok(Self::Forward),
             other => Err(ParseEnumError::new(
                 "UnderlyingAssetType",
                 other.to_string(),
@@ -728,6 +762,8 @@ mod proptest_support {
                 Just(Self::Commodity),
                 Just(Self::Bond),
                 Just(Self::Other),
+                Just(Self::Future),
+                Just(Self::Forward),
             ]
             .boxed()
         }
