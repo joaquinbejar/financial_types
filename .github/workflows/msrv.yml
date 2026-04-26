@@ -37,13 +37,13 @@ jobs:
             msrv-${{ runner.os }}-cargo-
 
       - name: Build (default features)
-        run: cargo +1.95 build
+        run: cargo +1.85 build
 
       - name: Build (no default features)
-        run: cargo +1.95 build --no-default-features
+        run: cargo +1.85 build --no-default-features
 
       - name: Build (all features)
-        run: cargo +1.95 build --all-features
+        run: cargo +1.85 build --all-features
 
       - name: Test (all features)
-        run: cargo +1.95 test --all-features
+        run: cargo +1.85 test --all-features
