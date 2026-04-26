@@ -36,7 +36,7 @@ All enums use `#[repr(u8)]` for compact memory layout (1 byte each) and include
 
 | Type | Variants | Description |
 |---|---|---|
-| `UnderlyingAssetType` | Crypto, Stock, Forex, Commodity, Bond, Other | Classification of asset classes |
+| `UnderlyingAssetType` | Crypto, Stock, Forex, Commodity, Bond, Other, Future, Forward | Classification of asset classes |
 | `Action` | Buy, Sell, Other | Trading actions |
 | `Side` | Long, Short | Position directional exposure |
 | `OptionStyle` | Call, Put | Option contract style |
@@ -127,7 +127,7 @@ assert!(asset.is_stock());
 assert!(!asset.is_crypto());
 ```
 
-Helpers: `is_stock()`, `is_crypto()`, `is_forex()`, `is_commodity()`, `is_bond()`
+Helpers: `is_stock()`, `is_crypto()`, `is_forex()`, `is_commodity()`, `is_bond()`, `is_future()`, `is_forward()`
 
 #### `Action`
 

@@ -19,6 +19,8 @@ fn snapshot_underlying_asset_type() {
         (UnderlyingAssetType::Commodity, "\"Commodity\""),
         (UnderlyingAssetType::Bond, "\"Bond\""),
         (UnderlyingAssetType::Other, "\"Other\""),
+        (UnderlyingAssetType::Future, "\"Future\""),
+        (UnderlyingAssetType::Forward, "\"Forward\""),
     ];
     for (variant, expected) in cases {
         let json = serde_json::to_string(&variant).unwrap();

@@ -13,6 +13,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `UnderlyingAssetType::Future` (discriminant `6`) and
+  `UnderlyingAssetType::Forward` (discriminant `7`) variants for
+  options whose underlying is a futures or forward price `F` rather
+  than a spot price `S` (Black-76 model). Companion `is_future` /
+  `is_forward` const helpers, `Display` / `FromStr` / `TryFrom<&str>` /
+  `TryFrom<u8>` support, `ALL` slice extension, serde wire-format
+  snapshots, and `utoipa` schema coverage. Strictly additive — no
+  existing discriminant changes; safe under `#[non_exhaustive]`. See
+  [#46](https://github.com/joaquinbejar/financial_types/issues/46).
 - Criterion benchmark suite at `benches/enums.rs` covering `as_str`,
   `Display`, `FromStr`, `TryFrom<u8>`, serde round-trip, and `is_*`
   helpers for every public enum. Run with `cargo bench`.

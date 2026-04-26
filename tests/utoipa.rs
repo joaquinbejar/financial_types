@@ -18,7 +18,16 @@ fn schema_json<T: PartialSchema>() -> String {
 #[test]
 fn schema_underlying_asset_type_lists_every_variant() {
     let json = schema_json::<UnderlyingAssetType>();
-    for variant in ["Crypto", "Stock", "Forex", "Commodity", "Bond", "Other"] {
+    for variant in [
+        "Crypto",
+        "Stock",
+        "Forex",
+        "Commodity",
+        "Bond",
+        "Other",
+        "Future",
+        "Forward",
+    ] {
         assert!(
             json.contains(variant),
             "UnderlyingAssetType schema missing variant {variant}: {json}"

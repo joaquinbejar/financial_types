@@ -17,6 +17,8 @@ fn test_display() {
     assert_eq!(format!("{}", UnderlyingAssetType::Commodity), "Commodity");
     assert_eq!(format!("{}", UnderlyingAssetType::Bond), "Bond");
     assert_eq!(format!("{}", UnderlyingAssetType::Other), "Other");
+    assert_eq!(format!("{}", UnderlyingAssetType::Future), "Future");
+    assert_eq!(format!("{}", UnderlyingAssetType::Forward), "Forward");
 }
 
 #[test]
@@ -26,6 +28,8 @@ fn test_is_helpers() {
     assert!(UnderlyingAssetType::Forex.is_forex());
     assert!(UnderlyingAssetType::Commodity.is_commodity());
     assert!(UnderlyingAssetType::Bond.is_bond());
+    assert!(UnderlyingAssetType::Future.is_future());
+    assert!(UnderlyingAssetType::Forward.is_forward());
     assert!(!UnderlyingAssetType::Other.is_stock());
     assert!(!UnderlyingAssetType::Stock.is_crypto());
     // Negative coverage for every helper — kills mutants that
@@ -33,11 +37,17 @@ fn test_is_helpers() {
     assert!(!UnderlyingAssetType::Stock.is_forex());
     assert!(!UnderlyingAssetType::Stock.is_commodity());
     assert!(!UnderlyingAssetType::Stock.is_bond());
+    assert!(!UnderlyingAssetType::Stock.is_future());
+    assert!(!UnderlyingAssetType::Stock.is_forward());
     assert!(!UnderlyingAssetType::Crypto.is_stock());
     assert!(!UnderlyingAssetType::Other.is_crypto());
     assert!(!UnderlyingAssetType::Other.is_forex());
     assert!(!UnderlyingAssetType::Other.is_commodity());
     assert!(!UnderlyingAssetType::Other.is_bond());
+    assert!(!UnderlyingAssetType::Other.is_future());
+    assert!(!UnderlyingAssetType::Other.is_forward());
+    assert!(!UnderlyingAssetType::Future.is_forward());
+    assert!(!UnderlyingAssetType::Forward.is_future());
 }
 
 #[test]
@@ -74,6 +84,8 @@ fn test_all_variants_serialize() {
         UnderlyingAssetType::Commodity,
         UnderlyingAssetType::Bond,
         UnderlyingAssetType::Other,
+        UnderlyingAssetType::Future,
+        UnderlyingAssetType::Forward,
     ];
     for variant in variants {
         let json = serde_json::to_string(&variant).unwrap();
@@ -108,6 +120,18 @@ fn test_from_str_valid() {
     assert_eq!(
         "  Commodity  ".parse::<UnderlyingAssetType>().unwrap(),
         UnderlyingAssetType::Commodity
+    );
+    assert_eq!(
+        "Future".parse::<UnderlyingAssetType>().unwrap(),
+        UnderlyingAssetType::Future
+    );
+    assert_eq!(
+        "forward".parse::<UnderlyingAssetType>().unwrap(),
+        UnderlyingAssetType::Forward
+    );
+    assert_eq!(
+        "  FORWARD  ".parse::<UnderlyingAssetType>().unwrap(),
+        UnderlyingAssetType::Forward
     );
 }
 
@@ -150,6 +174,14 @@ fn test_try_from_u8_valid() {
         UnderlyingAssetType::try_from(5u8).unwrap(),
         UnderlyingAssetType::Other
     );
+    assert_eq!(
+        UnderlyingAssetType::try_from(6u8).unwrap(),
+        UnderlyingAssetType::Future
+    );
+    assert_eq!(
+        UnderlyingAssetType::try_from(7u8).unwrap(),
+        UnderlyingAssetType::Forward
+    );
 }
 
 #[test]
@@ -167,6 +199,8 @@ fn test_display_parse_roundtrip() {
         UnderlyingAssetType::Commodity,
         UnderlyingAssetType::Bond,
         UnderlyingAssetType::Other,
+        UnderlyingAssetType::Future,
+        UnderlyingAssetType::Forward,
     ] {
         let s = format!("{variant}");
         let parsed: UnderlyingAssetType = s.parse().unwrap();
@@ -183,6 +217,8 @@ fn test_as_str_matches_display() {
         UnderlyingAssetType::Commodity,
         UnderlyingAssetType::Bond,
         UnderlyingAssetType::Other,
+        UnderlyingAssetType::Future,
+        UnderlyingAssetType::Forward,
     ] {
         assert_eq!(variant.as_str(), format!("{variant}"));
     }
@@ -205,6 +241,8 @@ fn test_all_variants_ordered() {
             UnderlyingAssetType::Commodity,
             UnderlyingAssetType::Bond,
             UnderlyingAssetType::Other,
+            UnderlyingAssetType::Future,
+            UnderlyingAssetType::Forward,
         ]
     );
     for (index, variant) in UnderlyingAssetType::ALL.iter().enumerate() {
