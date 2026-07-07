@@ -18,10 +18,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install MSRV toolchain (1.95)
+      - name: Install stable toolchain
         uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: "1.95"
+          toolchain: "stable"
 
       - name: Cache Rust dependencies
         uses: actions/cache@v4
@@ -37,13 +37,13 @@ jobs:
             msrv-${{ runner.os }}-cargo-
 
       - name: Build (default features)
-        run: cargo +1.95 build
+        run: cargo +stable build
 
       - name: Build (no default features)
-        run: cargo +1.95 build --no-default-features
+        run: cargo +stable build --no-default-features
 
       - name: Build (all features)
-        run: cargo +1.95 build --all-features
+        run: cargo +stable build --all-features
 
       - name: Test (all features)
-        run: cargo +1.95 test --all-features
+        run: cargo +stable test --all-features
