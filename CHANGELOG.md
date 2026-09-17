@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Dependencies updated to latest stable versions (utoipa 5.4 -> 5.5).
+
 ## [0.2.2] — 2026-04-26
 
 ### Added

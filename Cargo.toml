@@ -21,7 +21,7 @@ proptest = ["dep:proptest", "std"]
 
 [dependencies]
 serde = { version = "1.0", default-features = false, features = ["derive", "alloc"] }
-utoipa = { version = "5.4", optional = true }
+utoipa = { version = "5.5", optional = true }
 arbitrary = { version = "1.4", optional = true, features = ["derive"] }
 proptest = { version = "1.11", optional = true }
 
