@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.3] - 2026-09-18
+
+### Internal
+
+- Add Related projects section ([#48](https://github.com/joaquinbejar/financial_types/pull/48))
+
 ### Changed
 
 - Dependencies updated to latest stable versions (utoipa 5.4 -> 5.5).
