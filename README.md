@@ -60,14 +60,14 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-financial_types = "0.2"
+financial_types = "0.3"
 ```
 
 To enable OpenAPI schema support:
 
 ```toml
 [dependencies]
-financial_types = { version = "0.2", features = ["utoipa"] }
+financial_types = { version = "0.3", features = ["utoipa"] }
 ```
 
 ### Migration: 0.1 → 0.2

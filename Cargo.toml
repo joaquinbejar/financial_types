@@ -1,8 +1,8 @@
 [package]
 name = "financial_types"
-version = "0.2.3"
+version = "0.3.0"
 edition = "2024"
-rust-version = "1.86"
+rust-version = "1.88"
 authors = ["Joaquin Bejar <jb@taunais.com>"]
 description = "Core financial type definitions for trading systems: asset types, trading actions, position sides, and option styles."
 license = "MIT"
@@ -21,7 +21,7 @@ proptest = ["dep:proptest", "std"]
 
 [dependencies]
 serde = { version = "1.0", default-features = false, features = ["derive", "alloc"] }
-utoipa = { version = "5.5", optional = true }
+utoipa = { version = "6.0", optional = true }
 arbitrary = { version = "1.4", optional = true, features = ["derive"] }
 proptest = { version = "1.11", optional = true }
 
