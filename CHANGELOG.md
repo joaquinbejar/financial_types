@@ -11,6 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-05
+
+### Changed — breaking
+
+- The optional `utoipa` dependency is upgraded from 5.5 to 6.0: with the
+  `utoipa` feature, every type implements `utoipa::ToSchema` from utoipa 6.
+  Crates still on utoipa 5 should stay on 0.2.
+- Minimum supported Rust version raised from 1.86 to 1.88, required by
+  utoipa 6.
+
 ### Internal
 
 - CI and `make coverage` now require cargo-tarpaulin >= 0.37.5 (older
@@ -144,6 +154,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `opposite()` helpers on `Side` and `OptionStyle`.
 - `Display` on every enum; namespaced `Debug` on `Side` and `OptionStyle`.
 
-[Unreleased]: https://github.com/joaquinbejar/financial_types/compare/v0.2.2...HEAD
+[Unreleased]: https://github.com/joaquinbejar/financial_types/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/joaquinbejar/financial_types/compare/v0.2.3...v0.3.0
 [0.2.2]: https://github.com/joaquinbejar/financial_types/compare/v0.1.0...v0.2.2
 [0.1.0]: https://github.com/joaquinbejar/financial_types/releases/tag/v0.1.0
