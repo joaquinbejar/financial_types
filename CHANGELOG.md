@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Internal
+
+- CI and `make coverage` now require cargo-tarpaulin >= 0.37.5 (older
+  releases cannot read Rust 1.99 coverage data); coverage CI uses
+  `--timeout 600` instead of `--timeout 0`.
+
 ## [0.2.3] - 2026-09-18
 
 ### Changed
