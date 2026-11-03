@@ -269,7 +269,7 @@ fn test_unsupported_expiries_are_typed() {
     )
     .unwrap()
     .into();
-    // Inverse physical: representable, no formula.
+    // Inverse physical: refused at construction.
     draft.option = Some(
         OptionTerms::new(
             Decimal::from(100),
@@ -280,10 +280,9 @@ fn test_unsupported_expiries_are_typed() {
         )
         .unwrap(),
     );
-    let physical = InstrumentSpec::new(draft.clone()).unwrap();
     assert!(matches!(
-        physical.option_expiry(Side::Long, Decimal::ONE, Decimal::from(120)),
-        Err(InstrumentError::Unsupported { .. })
+        InstrumentSpec::new(draft.clone()),
+        Err(InstrumentError::InvalidCombination { .. })
     ));
     draft.option = Some(
         OptionTerms::new(
@@ -391,4 +390,135 @@ fn test_decimals_deserialize_only_from_exact_strings() {
     let mut t = base.clone();
     t["price_ticks"][1]["tick"] = serde_json::json!(0.0005);
     assert!(serde_json::from_value::<InstrumentSpec>(t).is_err());
+}
+
+#[test]
+fn test_accessors_and_display() {
+    let btc = a("BTC");
+    assert_eq!(btc.to_string(), "BTC");
+    assert_eq!(btc.as_str(), "BTC");
+    let id = InstrumentId::new("BTC-PERPETUAL").unwrap();
+    assert_eq!(id.to_string(), "BTC-PERPETUAL");
+    assert_eq!(id.as_str(), "BTC-PERPETUAL");
+    let option = reference::deribit::btc_option(
+        InstrumentId::new("BTC-27NOV26-100000-C").unwrap(),
+        1_795_766_400_000,
+        Decimal::from(100_000),
+        OptionStyle::Call,
+    )
+    .unwrap();
+    assert_eq!(option.lot(), d(1, 1));
+    assert_eq!(option.expiry_ms(), Some(1_795_766_400_000));
+    assert_eq!(option.price_ticks().bands().len(), 2);
+    assert_eq!(option.price_ticks().bands()[0].up_to, Some(d(5, 3)));
+    assert_eq!(
+        reference::deribit::btc_perpetual().unwrap().expiry_ms(),
+        None
+    );
+    // A zero premium is allowed (an option quoted at 0), and is 0 on both
+    // sides, never -0.
+    for side in [Side::Long, Side::Short] {
+        let zero = option
+            .option_premium(side, Decimal::ONE, Decimal::ZERO)
+            .unwrap();
+        assert_eq!(zero.amount, Decimal::ZERO);
+        assert_eq!(
+            serde_json::to_string(&zero).unwrap(),
+            r#"{"amount":"0","asset":"BTC"}"#
+        );
+    }
+}
+
+#[cfg(feature = "fixtures")]
+#[test]
+fn test_check_refuses_a_wrong_expectation() {
+    use financial_types::instrument::Money;
+    use financial_types::instrument::fixtures::{Case, ErrorKind, Expected, cases, check};
+    let all = cases().unwrap();
+    let find = |name: &str| -> Case {
+        all.iter()
+            .find(|c| c.name.starts_with(name))
+            .cloned()
+            .unwrap_or_else(|| panic!("no case {name}"))
+    };
+    let wrong = |mut case: Case, expected: Expected| {
+        case.expected = expected;
+        assert!(
+            check(&case).is_err(),
+            "{} accepted a wrong expectation",
+            case.name
+        );
+    };
+    // An exact amount, its settlement and its residual.
+    let pnl = find("inverse pnl long");
+    wrong(
+        pnl.clone(),
+        Expected::Amount {
+            exact: MoneyRatio::new(Ratio::new(d(1, 0), d(365, 0)).unwrap(), a("BTC")),
+            settled: None,
+        },
+    );
+    let Expected::Amount {
+        exact,
+        settled: Some(mut s),
+    } = pnl.expected.clone()
+    else {
+        panic!("amount expected");
+    };
+    s.amount = d(273_225, 8);
+    wrong(
+        pnl.clone(),
+        Expected::Amount {
+            exact: exact.clone(),
+            settled: Some(s.clone()),
+        },
+    );
+    s.amount = d(273_224, 8);
+    s.residual = Ratio::new(d(2, 0), d(2_287_500_000, 0)).unwrap();
+    wrong(
+        pnl,
+        Expected::Amount {
+            exact,
+            settled: Some(s),
+        },
+    );
+    // An error of another kind, and an error where a value is expected.
+    let overflow = find("Decimal::MAX contracts");
+    wrong(overflow, Expected::Error(ErrorKind::Inexact));
+    wrong(
+        find("linear notional"),
+        Expected::Error(ErrorKind::Overflow),
+    );
+    // A premium, a delivery leg, an abandoned option and a settlement.
+    wrong(
+        find("option premium long"),
+        Expected::Money(Money::new(d(-1874, 5), a("BTC"))),
+    );
+    wrong(
+        find("illustrative physical call long"),
+        Expected::Delivery {
+            underlying: Money::new(d(3, 0), a("BTC")),
+            cash: Money::new(d(-301, 0), a("USDT")),
+        },
+    );
+    wrong(
+        find("illustrative physical call long"),
+        Expected::Delivery {
+            underlying: Money::new(d(4, 0), a("BTC")),
+            cash: Money::new(d(-300, 0), a("USDT")),
+        },
+    );
+    wrong(
+        find("illustrative physical call out of the money"),
+        Expected::Valid,
+    );
+    let tie = find("tie 3/8");
+    let Expected::Settled(mut s) = tie.expected.clone() else {
+        panic!("settled expected");
+    };
+    s.amount = d(37, 2);
+    wrong(tie.clone(), Expected::Settled(s.clone()));
+    s.amount = d(38, 2);
+    s.residual = Ratio::new(d(1, 0), d(200, 0)).unwrap();
+    wrong(tie, Expected::Settled(s));
 }

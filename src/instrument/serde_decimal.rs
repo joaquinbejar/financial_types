@@ -33,8 +33,30 @@ pub(crate) fn parse(s: &str) -> Result<Decimal, String> {
     if !grammar(s) {
         return Err(alloc::format!("{s:?} is not a plain decimal string"));
     }
-    Decimal::from_str_exact(s)
-        .map_err(|_| alloc::format!("{s:?} is not exactly representable as a Decimal"))
+    // Trailing zeros after the point carry no value: drop them, so that a
+    // value is refused only for more than 28 significant decimal places.
+    let trimmed = match s.split_once('.') {
+        Some((integer, fraction)) => {
+            let fraction = fraction.trim_end_matches('0');
+            if fraction.len() > 28 {
+                return Err(alloc::format!("{s:?} has more than 28 decimal places"));
+            }
+            if fraction.is_empty() {
+                String::from(integer)
+            } else {
+                alloc::format!("{integer}.{fraction}")
+            }
+        }
+        None => String::from(s),
+    };
+    let value = Decimal::from_str_exact(&trimmed)
+        .map_err(|_| alloc::format!("{s:?} is not exactly representable as a Decimal"))?;
+    // "-0" is zero.
+    Ok(if value.is_zero() {
+        Decimal::ZERO
+    } else {
+        value
+    })
 }
 
 struct ExactVisitor;
@@ -117,9 +139,44 @@ mod tests {
             assert!(parse(bad).is_err(), "{bad:?}");
         }
         // 29 decimal places: rounded to 0 by Decimal::from_str, refused here.
-        assert!(parse("0.00000000000000000000000000001").is_err());
+        let error = parse("0.00000000000000000000000000001").unwrap_err();
+        assert!(error.contains("more than 28 decimal places"), "{error}");
+        // Trailing zeros beyond 28 places carry no value: accepted.
+        assert_eq!(parse("1.00000000000000000000000000000"), Ok(Decimal::ONE));
+        assert_eq!(parse("2.50"), Ok(Decimal::new(25, 1)));
+        // Exactly representable: 28 decimal places, mantissa 10^28 + 1 < 2^96.
+        assert_eq!(
+            parse("1.0000000000000000000000000001"),
+            Ok(Decimal::from_i128_with_scale(
+                10_000_000_000_000_000_000_000_000_001,
+                28
+            ))
+        );
+        // The non-zero digit is the 28th place; the 29th is a zero: 1e-28.
+        assert_eq!(
+            parse("0.00000000000000000000000000010"),
+            Ok(Decimal::new(1, 28))
+        );
+        // A non-zero digit at the 29th place: refused.
+        assert!(parse("0.000000000000000000000000000010").is_err());
+        assert!(parse("1.00000000000000000000000000001").is_err());
+        assert!(!parse("-0").unwrap().is_sign_negative());
+        assert!(!parse("-0.000").unwrap().is_sign_negative());
         // 29 significant digits.
         assert!(parse("9.0000000000000000000000000001").is_err());
         assert!(parse("79228162514264337593543950336").is_err());
+    }
+
+    #[test]
+    fn test_a_number_is_refused_with_the_expected_message() {
+        #[derive(Debug, serde::Deserialize)]
+        struct W(#[serde(with = "super")] Decimal);
+        let ok = serde_json::from_str::<W>("\"0.1\"").unwrap();
+        assert_eq!(ok.0, Decimal::new(1, 1));
+        let error = serde_json::from_str::<W>("0.1").unwrap_err().to_string();
+        assert!(
+            error.contains("a decimal string, exactly representable"),
+            "{error}"
+        );
     }
 }

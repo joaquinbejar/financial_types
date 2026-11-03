@@ -427,18 +427,22 @@ pub struct InstrumentDraft {
 /// Built only by [`InstrumentSpec::new`], directly or through serde, which
 /// checks the admissible combinations:
 ///
-/// | kind | margining | size | settled in | expiry | option terms |
-/// |---|---|---|---|---|---|
-/// | spot | linear | 1 underlying | price asset | none | none |
-/// | future | linear | underlying quantity | price asset | required | none |
-/// | future | inverse | price asset value | underlying | required | none |
-/// | perpetual | linear | underlying quantity | price asset | none | none |
-/// | perpetual | inverse | price asset value | underlying | none | none |
-/// | option | linear | underlying quantity | price asset, premium in price asset | required | required |
-/// | option | inverse | underlying quantity | underlying, premium in underlying | required | required |
+/// | kind | margining | size | settled in | expiry | option terms | option settlement |
+/// |---|---|---|---|---|---|---|
+/// | spot | linear | 1 underlying | price asset | none | none | |
+/// | future | linear | underlying quantity | price asset | required | none | |
+/// | future | inverse | price asset value | underlying | required | none | |
+/// | perpetual | linear | underlying quantity | price asset | none | none | |
+/// | perpetual | inverse | price asset value | underlying | none | none | |
+/// | option | linear | underlying quantity | price asset, premium in price asset | required | required | cash or physical |
+/// | option | inverse | underlying quantity | underlying, premium in underlying | required | required | cash only |
 ///
 /// The underlying and the price asset must differ. Nothing converts one
 /// asset into another: `USD` and `USDT` are different.
+///
+/// An option of either exercise style can be built, and its premium and
+/// PnL computed; only [`InstrumentSpec::option_expiry`] is limited to
+/// European exercise (American is [`InstrumentError::Unsupported`]).
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(try_from = "InstrumentDraft", into = "InstrumentDraft")]
 pub struct InstrumentSpec(InstrumentDraft);
@@ -555,6 +559,12 @@ impl InstrumentSpec {
                 };
                 expect("settlement asset", paid_in, &d.settlement_asset)?;
                 expect("premium asset", paid_in, terms.premium_asset())?;
+                if margining == Margining::Inverse && terms.settlement() == SettlementType::Physical
+                {
+                    return Err(InstrumentError::invalid_combination(
+                        "an inverse option settles in cash only",
+                    ));
+                }
             }
             (kind, margining) => {
                 return Err(InstrumentError::invalid_combination(alloc::format!(

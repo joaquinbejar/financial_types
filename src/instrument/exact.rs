@@ -220,6 +220,32 @@ mod tests {
     }
 
     #[test]
+    fn test_fit_strips_trailing_zeros_before_refusing() {
+        // 0.2 x 5e-28: mantissa 10 at scale 29, stripped to 1e-28.
+        assert_eq!(
+            exact_mul("t", d("0.2"), d("0.0000000000000000000000000005")),
+            Ok(d("0.0000000000000000000000000001"))
+        );
+        // 0.25 x 4e-27 = 1e-27: two trailing zeros at scale 29.
+        assert_eq!(
+            exact_mul("t", d("0.25"), d("0.000000000000000000000000004")),
+            Ok(d("0.000000000000000000000000001"))
+        );
+        // Mantissa exactly 2^96 at scale 1: not representable, and its
+        // integer part is below 2^96, so inexact rather than overflow.
+        assert_eq!(
+            fit("t", 1_i128 << 96, 1),
+            Err(InstrumentError::inexact("t"))
+        );
+        assert_eq!(
+            fit("t", 1_i128 << 96, 0),
+            Err(InstrumentError::overflow("t"))
+        );
+        assert_eq!(fit("t", (1_i128 << 96) - 1, 0), Ok(Decimal::MAX));
+        assert_eq!(fit("t", 1_000, 30), Ok(d("0.000000000000000000000000001")));
+    }
+
+    #[test]
     fn test_is_multiple_is_exact() {
         assert_eq!(is_multiple("t", d("60000.1"), d("0.1")), Ok(true));
         assert_eq!(is_multiple("t", d("60000.15"), d("0.1")), Ok(false));

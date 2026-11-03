@@ -19,10 +19,15 @@ pub struct Money {
 }
 
 impl Money {
-    /// An amount of `asset`.
+    /// An amount of `asset`. A zero is stored as `0`, never `-0`.
     #[must_use]
     #[inline]
     pub fn new(amount: Decimal, asset: AssetCode) -> Self {
+        let amount = if amount.is_zero() {
+            Decimal::ZERO
+        } else {
+            amount
+        };
         Self { amount, asset }
     }
 }
@@ -180,7 +185,11 @@ impl Ratio {
     /// [`InstrumentError::InvalidField`] for a scale above 28, and
     /// [`InstrumentError::Overflow`] or [`InstrumentError::Inexact`] when an
     /// integer intermediate, the rounded amount or the residual is out of
-    /// range.
+    /// range. The residual's denominator is the scaled denominator, which
+    /// can be out of range even when the rounded amount exists: for
+    /// `1.0000000000000000000000000001 / 9` at 2 places it is `9 * 10^28`,
+    /// and the result is `Overflow` (a typed error, never a wrong value)
+    /// under these bounded semantics.
     pub fn round(
         &self,
         scale: u32,
@@ -201,20 +210,19 @@ impl Ratio {
         let q_den = pow10(num.scale())
             .and_then(|f| den.mantissa().checked_mul(f))
             .ok_or_else(|| InstrumentError::overflow(OP))?;
-        if q_den <= 0 {
-            return Err(InstrumentError::invalid_field(
-                "denominator",
-                "a ratio's denominator must be positive",
-            ));
-        }
-        let floor = p.div_euclid(q_den);
-        let r = p.rem_euclid(q_den);
+        // q_den > 0 by the invariant den > 0; a zero would be a typed error.
+        let floor = p
+            .checked_div_euclid(q_den)
+            .ok_or_else(|| InstrumentError::overflow(OP))?;
+        let r = p
+            .checked_rem_euclid(q_den)
+            .ok_or_else(|| InstrumentError::overflow(OP))?;
         let up = || {
             floor
                 .checked_add(1)
                 .ok_or_else(|| InstrumentError::overflow(OP))
         };
-        let negative = p < 0;
+        let negative = p.is_negative();
         let q = match rule {
             RoundingRule::Floor => floor,
             RoundingRule::Ceil if r > 0 => up()?,
@@ -223,7 +231,6 @@ impl Ratio {
             RoundingRule::TowardZero => floor,
             RoundingRule::AwayFromZero if !negative && r > 0 => up()?,
             RoundingRule::AwayFromZero => floor,
-            RoundingRule::HalfEven | RoundingRule::HalfAwayFromZero if r == 0 => floor,
             RoundingRule::HalfEven | RoundingRule::HalfAwayFromZero => {
                 let rest = q_den - r;
                 match r.cmp(&rest) {
@@ -283,7 +290,8 @@ impl MoneyRatio {
     ///
     /// # Errors
     ///
-    /// As [`Ratio::round`].
+    /// As [`Ratio::round`], including its [`InstrumentError::Overflow`]
+    /// when the exact residual is out of range.
     pub fn settle(&self, scale: u32, rule: RoundingRule) -> Result<Rounded, InstrumentError> {
         let (amount, residual) = self.ratio.round(scale, rule)?;
         Ok(Rounded {
@@ -403,6 +411,74 @@ mod tests {
         ));
         // 0.375: a tie with an odd floor goes up under half even.
         assert_eq!(r("3", "8").round(2, HalfEven).unwrap().0, d("0.38"));
+    }
+
+    #[test]
+    fn test_round_exact_values_are_unchanged_by_every_rule() {
+        use RoundingRule::*;
+        for rule in [
+            Floor,
+            Ceil,
+            TowardZero,
+            AwayFromZero,
+            HalfEven,
+            HalfAwayFromZero,
+        ] {
+            for (num, expected) in [("1", "0.25"), ("-1", "-0.25")] {
+                let (amount, residual) = r(num, "4").round(2, rule).unwrap();
+                assert_eq!(amount, d(expected), "{rule:?} {num}");
+                assert!(residual.is_zero(), "{rule:?} {num}");
+            }
+        }
+        // Non-ties on both sides of the midpoint.
+        assert_eq!(r("1", "3").round(0, HalfEven).unwrap().0, d("0"));
+        assert_eq!(r("2", "3").round(0, HalfEven).unwrap().0, d("1"));
+        assert_eq!(r("-2", "3").round(0, HalfAwayFromZero).unwrap().0, d("-1"));
+    }
+
+    #[test]
+    fn test_ratio_is_zero_and_scaled_equality() {
+        assert!(Ratio::zero().is_zero());
+        assert!(!r("1", "3").is_zero());
+        assert!(r("0.5", "0.5").equals(&r("1", "1")).unwrap());
+        assert!(r("0.25", "0.5").equals(&r("0.5", "1")).unwrap());
+        assert!(!r("0.25", "0.5").equals(&r("0.5", "2")).unwrap());
+    }
+
+    #[test]
+    fn test_money_ratio_equality_needs_value_and_asset() {
+        let btc = AssetCode::new("BTC").unwrap();
+        let usd = AssetCode::new("USD").unwrap();
+        let x = MoneyRatio::new(r("1", "2"), btc.clone());
+        assert!(
+            x.equals(&MoneyRatio::new(r("2", "4"), btc.clone()))
+                .unwrap()
+        );
+        assert!(!x.equals(&MoneyRatio::new(r("1", "2"), usd)).unwrap());
+        assert!(!x.equals(&MoneyRatio::new(r("1", "3"), btc)).unwrap());
+    }
+
+    #[test]
+    fn test_round_residual_out_of_range_is_a_typed_overflow() {
+        let x = r("1.0000000000000000000000000001", "9");
+        assert!(matches!(
+            x.round(2, RoundingRule::HalfEven),
+            Err(InstrumentError::Overflow { .. })
+        ));
+        // With 27 decimals the residual fits.
+        let y = r("1.000000000000000000000000001", "9");
+        assert_eq!(y.round(2, RoundingRule::HalfEven).unwrap().0, d("0.11"));
+    }
+
+    #[test]
+    fn test_money_zero_is_never_negative() {
+        let btc = AssetCode::new("BTC").unwrap();
+        let m = Money::new(-Decimal::ZERO, btc);
+        assert!(!m.amount.is_sign_negative());
+        assert_eq!(
+            serde_json::to_string(&m).unwrap(),
+            r#"{"amount":"0","asset":"BTC"}"#
+        );
     }
 
     #[test]
