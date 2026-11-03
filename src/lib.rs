@@ -23,11 +23,13 @@
 //!
 //! - Full `serde` serialization/deserialization support
 //! - Optional `utoipa` support for OpenAPI schema generation (enable the `utoipa` feature)
-//! - Optional `instruments` feature: instrument specifications and exact
-//!   cashflow formulas, adding `rust_decimal` (without `std`, with `serde`)
-//!   and `thiserror` (without `std`); `no_std` with `alloc`
-//! - Optional `fixtures` feature (implies `instruments`): shared, hand
-//!   computed instrument fixtures, versioned data for downstream crates
+//! - Optional `instruments` feature (approved 2026-11-03): instrument
+//!   specifications and exact cashflow formulas, adding `rust_decimal`
+//!   (without `std`, with `serde`) and `thiserror` (without `std`);
+//!   `no_std` with `alloc`
+//! - Optional `fixtures` feature (approved 2026-11-03; implies
+//!   `instruments`): shared, hand computed instrument fixtures, versioned
+//!   data for downstream crates
 //! - `#[repr(u8)]` on all enums for deterministic layout
 //! - `#[must_use]` on pure helper methods
 //! - `FromStr`, `TryFrom<&str>`, and `TryFrom<u8>` on every public enum,

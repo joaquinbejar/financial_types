@@ -381,6 +381,23 @@ mod tests {
             back(p, pr, r("1", "8"));
             back(n, nr, r("-1", "8"));
         }
+        // A large negative tie: -123456789012345678901233.5 at scale 0.
+        let big_tie = Ratio::new(
+            Decimal::from_i128_with_scale(-246_913_578_024_691_357_802_467, 0),
+            d("2"),
+        )
+        .unwrap();
+        let floor = Decimal::from_i128_with_scale(-123_456_789_012_345_678_901_234, 0);
+        let ceil = Decimal::from_i128_with_scale(-123_456_789_012_345_678_901_233, 0);
+        assert_eq!(big_tie.round(0, HalfEven).unwrap().0, floor);
+        assert_eq!(big_tie.round(0, HalfAwayFromZero).unwrap().0, floor);
+        assert_eq!(big_tie.round(0, TowardZero).unwrap().0, ceil);
+        // Scaling beyond i128 is a typed overflow.
+        let max = Ratio::new(Decimal::MAX, d("3")).unwrap();
+        assert!(matches!(
+            max.round(28, HalfEven),
+            Err(InstrumentError::Overflow { .. })
+        ));
         // 0.375: a tie with an odd floor goes up under half even.
         assert_eq!(r("3", "8").round(2, HalfEven).unwrap().0, d("0.38"));
     }
