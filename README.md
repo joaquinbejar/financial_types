@@ -53,6 +53,13 @@ All enums use `#[repr(u8)]` for compact memory layout (1 byte each) and include
 - **`no_std`**: Compiles without `std`; only `alloc` is required
 - **Fuzzing**: Optional `arbitrary` and `proptest` features generate
   random variants for property-based testing
+- **Instruments**: Optional `instruments` feature: validated contract
+  specifications (spot, futures, perpetuals, options; linear and inverse)
+  with exact notional, PnL, premium and expiry formulas, and dated
+  reference contracts (Deribit BTC, Binance USDⓈ-M `BTCUSDT`). Adds
+  `rust_decimal` and `thiserror`, both without `std`
+- **Fixtures**: Optional `fixtures` feature (implies `instruments`):
+  shared, hand computed instrument cases for downstream crates
 
 ### Installation
 
@@ -165,6 +172,27 @@ assert!(OptionStyle::Call < OptionStyle::Put); // Ord supported
 ```
 
 Helpers: `is_call()`, `is_put()`, `opposite()`
+
+#### Instruments (feature `instruments`)
+
+```rust
+use financial_types::Side;
+use financial_types::instrument::{RoundingRule, reference::deribit};
+use rust_decimal::Decimal;
+
+let perp = deribit::btc_perpetual().unwrap();
+// Long 1000 contracts (10 000 USD) from 60 000 to 61 000 USD.
+let pnl = perp
+    .realized_pnl(Side::Long, Decimal::from(1000), Decimal::from(60_000), Decimal::from(61_000))
+    .unwrap();
+// Exactly 1/366 BTC, settled at satoshi scale with the residual kept.
+let settled = pnl.settle(8, RoundingRule::HalfEven).unwrap();
+assert_eq!(settled.amount.amount, Decimal::new(273_224, 8));
+```
+
+Every product and difference is exact: a result a `Decimal` cannot hold is
+an error, never a rounded value. Cashflows are signed from the holder's
+point of view (positive is received).
 
 #### Serialization
 

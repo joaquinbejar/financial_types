@@ -11,6 +11,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `instrument` module behind the new optional `instruments` feature
+  (#53): validated `InstrumentSpec` for spot, dated futures, perpetuals and
+  options, linear and inverse, with separate underlying, price, settlement
+  and premium assets (`USD` and `USDT` are distinct), `ContractSize` by
+  base quantity or quote value, `TickSchedule` bands and a lot. Exact
+  `notional`, `realized_pnl`, `option_premium` and `option_expiry`
+  (European; cash, or physical for linear options in the money), signed
+  from the holder's point of view. Products and differences are exact on
+  integer mantissas: a result a `Decimal` cannot hold is `Inexact` or
+  `Overflow`, never rounded. Inverse amounts are exact `Ratio`s, rounded
+  only by `MoneyRatio::settle` with an explicit `RoundingRule`, which
+  returns the exact residual. Deserialization validates. `From<Side> for
+  Action` and `TryFrom<Action> for Side`.
+- Dated reference contracts (`instrument::reference`), read 2026-11-03:
+  Deribit BTC options (1 BTC, premium tick 0.0001 up to 0.005 inclusive
+  and 0.0005 above, lot 0.1), BTC inverse futures (10 USD, tick 2.5) and
+  `BTC-PERPETUAL` (10 USD, tick 0.5); Binance USDⓈ-M `BTCUSDT` (tick 0.1,
+  step 0.001). The inverse contract value is 10 USD, where an earlier
+  illustrative fixture elsewhere used 100.
+- Shared hand computed fixtures behind the new `fixtures` feature
+  (`instrument::fixtures`): versioned data, so changing a case is a change
+  to this crate.
+
+### Dependencies
+
+- `rust_decimal` 1.43 (no default features, `serde`) and `thiserror` 2
+  (no default features), both optional and only with `instruments`.
+  Default features are unchanged.
+
 ## [0.3.0] - 2026-10-05
 
 ### Changed — breaking
