@@ -15,20 +15,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Instrument specifications and exact cashflow formulas ([#53](https://github.com/joaquinbejar/financial_types/pull/53))
-
-### Fixed
-
-- Review round 3: mutants, inverse physical, signed zero ([#53](https://github.com/joaquinbejar/financial_types/pull/53))
-- Decimals deserialize only from exact strings ([#53](https://github.com/joaquinbejar/financial_types/pull/53))
-
-### Internal
-
-- Record the feature approval date; large tie probes ([#53](https://github.com/joaquinbejar/financial_types/pull/53))
-- Changelog, README and CI for the instruments features ([#53](https://github.com/joaquinbejar/financial_types/pull/53))
-
-### Added
-
 - `instrument` module behind the new optional `instruments` feature
   (#53): validated `InstrumentSpec` for spot, dated futures, perpetuals and
   options, linear and inverse, with separate underlying, price, settlement
@@ -201,7 +187,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `opposite()` helpers on `Side` and `OptionStyle`.
 - `Display` on every enum; namespaced `Debug` on `Side` and `OptionStyle`.
 
-[Unreleased]: https://github.com/joaquinbejar/financial_types/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/joaquinbejar/financial_types/compare/v0.3.1...HEAD
+[0.3.1]: https://github.com/joaquinbejar/financial_types/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/joaquinbejar/financial_types/compare/v0.2.3...v0.3.0
 [0.2.2]: https://github.com/joaquinbejar/financial_types/compare/v0.1.0...v0.2.2
 [0.1.0]: https://github.com/joaquinbejar/financial_types/releases/tag/v0.1.0
