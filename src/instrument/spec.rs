@@ -116,6 +116,7 @@ pub struct ContractSize {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct ContractSizeRepr {
     kind: SizeKind,
+    #[serde(with = "super::serde_decimal")]
     amount: Decimal,
     asset: AssetCode,
 }
@@ -197,8 +198,10 @@ impl ContractSize {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TickBand {
     /// The inclusive upper bound; `None` for the last, unbounded band.
+    #[serde(with = "super::serde_decimal::option")]
     pub up_to: Option<Decimal>,
     /// The price step in the band.
+    #[serde(with = "super::serde_decimal")]
     pub tick: Decimal,
 }
 
@@ -303,6 +306,7 @@ pub struct OptionTerms {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct OptionTermsRepr {
+    #[serde(with = "super::serde_decimal")]
     strike: Decimal,
     style: OptionStyle,
     exercise: ExerciseStyle,
@@ -410,6 +414,7 @@ pub struct InstrumentDraft {
     /// Order price steps (the premium, for an option).
     pub price_ticks: TickSchedule,
     /// Order size step, in contracts.
+    #[serde(with = "super::serde_decimal")]
     pub lot: Decimal,
     /// Expiry, milliseconds since the Unix epoch; futures and options only.
     pub expiry_ms: Option<u64>,

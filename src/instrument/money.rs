@@ -12,6 +12,7 @@ use super::exact::{fit, pow10};
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Money {
     /// The amount; serialized as a string, exactly.
+    #[serde(with = "super::serde_decimal")]
     pub amount: Decimal,
     /// The asset.
     pub asset: AssetCode,
@@ -44,7 +45,9 @@ pub struct Ratio {
 /// The serialized form of a [`Ratio`].
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 struct RatioRepr {
+    #[serde(with = "super::serde_decimal")]
     num: Decimal,
+    #[serde(with = "super::serde_decimal")]
     den: Decimal,
 }
 

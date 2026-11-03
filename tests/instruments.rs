@@ -321,3 +321,74 @@ fn test_unsupported_expiries_are_typed() {
     );
     assert_eq!(v.asset, a("BTC"));
 }
+
+#[test]
+fn test_decimals_deserialize_only_from_exact_strings() {
+    use financial_types::instrument::Money;
+    // A value Decimal would round to 0, and a JSON number: both refused.
+    assert!(
+        serde_json::from_str::<Money>(
+            r#"{"amount":"0.00000000000000000000000000001","asset":"BTC"}"#
+        )
+        .is_err()
+    );
+    assert!(serde_json::from_str::<Money>(r#"{"amount":0.1,"asset":"BTC"}"#).is_err());
+    assert!(serde_json::from_str::<Ratio>(r#"{"num":0.1,"den":"1"}"#).is_err());
+    assert!(serde_json::from_str::<Ratio>(r#"{"num":"1e5","den":"1"}"#).is_err());
+    assert!(
+        serde_json::from_str::<Ratio>(r#"{"num":"9.0000000000000000000000000001","den":"1"}"#)
+            .is_err()
+    );
+    let ok: Money = serde_json::from_str(r#"{"amount":"-0.01875","asset":"BTC"}"#).unwrap();
+    assert_eq!(ok.amount, d(-1875, 5));
+
+    // Nested paths of a spec: strike, tick band bound, tick, contract size
+    // and lot.
+    let spec = reference::deribit::btc_option(
+        InstrumentId::new("BTC-27NOV26-100000-C").unwrap(),
+        1,
+        Decimal::from(100_000),
+        OptionStyle::Call,
+    )
+    .unwrap();
+    let base: serde_json::Value = serde_json::to_value(&spec).unwrap();
+    let tiny = serde_json::json!("0.00000000000000000000000000001");
+    let paths: [&[&str]; 4] = [
+        &["option", "strike"],
+        &["size", "amount"],
+        &["lot"],
+        &["price_ticks"],
+    ];
+    for path in paths {
+        let mut v = base.clone();
+        let mut slot = &mut v;
+        for key in path {
+            slot = &mut slot[*key];
+        }
+        if path == ["price_ticks"] {
+            slot[0]["up_to"] = tiny.clone();
+        } else {
+            *slot = tiny.clone();
+        }
+        assert!(
+            serde_json::from_value::<InstrumentSpec>(v.clone()).is_err(),
+            "{path:?}"
+        );
+        // And a JSON number in the same place.
+        if path != ["price_ticks"] {
+            let mut n = base.clone();
+            let mut slot = &mut n;
+            for key in path {
+                slot = &mut slot[*key];
+            }
+            *slot = serde_json::json!(0.5);
+            assert!(
+                serde_json::from_value::<InstrumentSpec>(n).is_err(),
+                "{path:?}"
+            );
+        }
+    }
+    let mut t = base.clone();
+    t["price_ticks"][1]["tick"] = serde_json::json!(0.0005);
+    assert!(serde_json::from_value::<InstrumentSpec>(t).is_err());
+}

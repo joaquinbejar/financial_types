@@ -56,6 +56,7 @@ mod exact;
 mod formulas;
 mod money;
 pub mod reference;
+mod serde_decimal;
 mod spec;
 
 #[cfg(feature = "fixtures")]
