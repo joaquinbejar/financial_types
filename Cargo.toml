@@ -14,13 +14,19 @@ categories = ["finance", "data-structures"]
 
 [features]
 default = ["std"]
-std = ["serde/std"]
+std = ["serde/std", "rust_decimal?/std", "thiserror?/std"]
+# Instrument specifications and exact cashflow formulas (no_std with alloc).
+instruments = ["dep:rust_decimal", "dep:thiserror"]
+# Shared, hand computed instrument fixtures: versioned data.
+fixtures = ["instruments"]
 utoipa = ["dep:utoipa", "std"]
 arbitrary = ["dep:arbitrary", "std"]
 proptest = ["dep:proptest", "std"]
 
 [dependencies]
 serde = { version = "1.0", default-features = false, features = ["derive", "alloc"] }
+rust_decimal = { version = "1.43", default-features = false, features = ["serde"], optional = true }
+thiserror = { version = "2.0", default-features = false, optional = true }
 utoipa = { version = "6.0", optional = true }
 arbitrary = { version = "1.4", optional = true, features = ["derive"] }
 proptest = { version = "1.11", optional = true }

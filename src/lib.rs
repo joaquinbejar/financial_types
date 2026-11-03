@@ -10,6 +10,12 @@
 //! - [`Side`] — Position directional exposure (long, short)
 //! - [`OptionStyle`] — Option contract style (call, put)
 //!
+//! With the `instruments` feature, the `instrument` module adds validated
+//! contract specifications (spot, futures, perpetuals and options, linear
+//! and inverse) and exact notional, PnL, premium and expiry formulas, with
+//! dated reference contracts (Deribit BTC options, futures and perpetual;
+//! Binance USDⓈ-M `BTCUSDT`).
+//!
 //! All enums use `#[repr(u8)]` for compact memory layout and are designed for
 //! high-performance financial systems.
 //!
@@ -17,6 +23,11 @@
 //!
 //! - Full `serde` serialization/deserialization support
 //! - Optional `utoipa` support for OpenAPI schema generation (enable the `utoipa` feature)
+//! - Optional `instruments` feature: instrument specifications and exact
+//!   cashflow formulas, adding `rust_decimal` (without `std`, with `serde`)
+//!   and `thiserror` (without `std`); `no_std` with `alloc`
+//! - Optional `fixtures` feature (implies `instruments`): shared, hand
+//!   computed instrument fixtures, versioned data for downstream crates
 //! - `#[repr(u8)]` on all enums for deterministic layout
 //! - `#[must_use]` on pure helper methods
 //! - `FromStr`, `TryFrom<&str>`, and `TryFrom<u8>` on every public enum,
@@ -82,6 +93,8 @@
 
 extern crate alloc;
 
+#[cfg(feature = "instruments")]
+pub mod instrument;
 pub mod prelude;
 
 use alloc::string::{String, ToString};
