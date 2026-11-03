@@ -66,7 +66,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! financial_types = { version = "0.1", default-features = false }
+//! financial_types = { version = "0.3", default-features = false }
 //! ```
 //!
 //! The `alloc` crate is always required (used by `ParseEnumError`).
