@@ -47,3 +47,12 @@ jobs:
 
       - name: Test (all features)
         run: cargo +stable test --all-features
+
+      - name: Build instruments without std (library)
+        run: cargo +stable build --no-default-features --features instruments --lib
+
+      - name: Test (instruments only, no default features)
+        run: cargo +stable test --no-default-features --features instruments
+
+      - name: Test (fixtures only, no default features)
+        run: cargo +stable test --no-default-features --features fixtures
