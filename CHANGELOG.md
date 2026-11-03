@@ -11,6 +11,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-11-03
+
+### Added
+
+- Instrument specifications and exact cashflow formulas ([#53](https://github.com/joaquinbejar/financial_types/pull/53))
+
+### Fixed
+
+- Review round 3: mutants, inverse physical, signed zero ([#53](https://github.com/joaquinbejar/financial_types/pull/53))
+- Decimals deserialize only from exact strings ([#53](https://github.com/joaquinbejar/financial_types/pull/53))
+
+### Internal
+
+- Record the feature approval date; large tie probes ([#53](https://github.com/joaquinbejar/financial_types/pull/53))
+- Changelog, README and CI for the instruments features ([#53](https://github.com/joaquinbejar/financial_types/pull/53))
+
 ### Added
 
 - `instrument` module behind the new optional `instruments` feature
