@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.3] - 2026-11-13
+
+### Internal
+
+- Sync contact info and related projects ([#58](https://github.com/joaquinbejar/financial_types/pull/58))
+
 ## [0.3.2] - 2026-11-03
 
 ### Internal
