@@ -29,7 +29,6 @@ If you have any questions, issues, or would like to provide feedback, please fee
 
 
 ### **Contact Information**
-
 - **Author**: Joaquín Béjar García
 - **Email**: jb@taunais.com
 - **Telegram**: [@joaquin_bejar](https://t.me/joaquin_bejar)
@@ -51,7 +50,10 @@ Repositories by the same author that this project depends on, and repositories t
 
 | Repository | Description |
 |------------|-------------|
-| [option_type](https://github.com/joaquinbejar/option_type) · [crates.io](https://crates.io/crates/option_type) | Enum-based classification of vanilla and exotic option contracts. |
-| [OptionStratLib](https://github.com/joaquinbejar/OptionStratLib) · [crates.io](https://crates.io/crates/optionstratlib) | Options pricing, Greeks, strategies and simulation library. |
+| [OptionStratLib](https://github.com/joaquinbejar/OptionStratLib) | Options trading and strategy library; uses these enums for option style, side and action across its pricing and strategy code. |
+| [arbitrage-rs](https://github.com/joaquinbejar/arbitrage-rs) | Arbitrage models for spot, futures, perpetuals and options; uses these enums to describe instruments and trade sides. |
+| [margin-rs](https://github.com/joaquinbejar/margin-rs) | Risk and margin engine; uses these enums to classify positions and options when computing greeks and margin. |
+| [market-maker-rs](https://github.com/joaquinbejar/market-maker-rs) | Quantitative market making library; uses these enums for order sides and option styles in quoting and risk. |
+| [option_type](https://github.com/joaquinbejar/option_type) | Enum-based classification of option contracts; builds on these core enums for option style and side. |
 
 <!-- related-projects:end -->
