@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.4] - 2026-11-27
+
+### Internal
+
+- Forbid author-owned dependencies in PRs ([#60](https://github.com/joaquinbejar/financial_types/pull/60))
+
 ## [0.3.3] - 2026-11-13
 
 ### Internal
