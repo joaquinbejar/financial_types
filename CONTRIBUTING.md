@@ -56,6 +56,10 @@ make pre-push
 
 Run locally with `cargo deny check` before pushing dependency changes.
 
+### Dependencies
+
+Pull requests must not add dependencies (crates, packages, libraries, actions) that are owned, maintained or published by the pull request's author. If you need functionality from a library you maintain, implement the needed logic directly in this repository instead. PRs that add such a dependency will be asked to remove it before review continues. Any new third party dependency must be justified in the PR description (why it is needed, license, maintenance status).
+
 ## Mutation testing
 
 `cargo-mutants` runs in CI on every PR (and a full schedule on
